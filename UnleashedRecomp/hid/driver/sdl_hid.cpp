@@ -12,8 +12,26 @@
 
 static bool IsBoostOnRightTriggerActive()
 {
-    // true if sonic is werehog and right trigger preference is boost
-    return !App::s_isWerehog && Config::RightTriggerAction == ERightTriggerAction::Boost;
+    const bool userConfigIsBoost = Config::RightTriggerAction == ERightTriggerAction::Boost;
+
+    if (!userConfigIsBoost || App::s_isWerehog) 
+        return false;
+
+    auto gameDocInstance = SWA::CGameDocument::GetInstance();
+    
+    if (gameDocInstance == NULL) 
+        return false
+
+    const char* stageName = gameDocInstance->m_pMember->m_StageName.c_str();
+    const bool hasStage = stageName && strlen(stageName);
+
+    if (hasStage == false) 
+        return false
+    
+    // there's no "BossDarkGaia1_2Air" so regex is NOT needeed
+    const bool playingAsChip = !strcmp(stageName, "BossDarkGaia1_1Air");
+    
+    return !playingAsChip;
 }
 
 static uint32_t GetBoostCancelDurationMs()
