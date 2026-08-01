@@ -5,43 +5,102 @@
 #include <os/logger.h>
 #include <ui/game_window.h>
 #include <kernel/xdm.h>
+#include <api/SWA.h>
 #include <app.h>
 
 #define TRANSLATE_INPUT(S, X) SDL_GameControllerGetButton(controller, S) << FirstBitLow(X)
 #define VIBRATION_TIMEOUT_MS 5000
 
-static bool IsBoostOnRightTriggerActive()
-{
-    const bool userConfigIsBoost = Config::RightTriggerAction == ERightTriggerAction::Boost;
-
-    if (!userConfigIsBoost || App::s_isWerehog) 
-        return false;
-
-    auto gameDocInstance = SWA::CGameDocument::GetInstance();
-    
-    if (gameDocInstance == NULL) 
-        return false
-
-    const char* stageName = gameDocInstance->m_pMember->m_StageName.c_str();
-    const bool hasStage = stageName && strlen(stageName);
-
-    if (hasStage == false) 
-        return false
-    
-    // there's no "BossDarkGaia1_2Air" so regex is NOT needeed
-    const bool playingAsChip = !strcmp(stageName, "BossDarkGaia1_1Air");
-    
-    return !playingAsChip;
-}
-
-static uint32_t GetBoostCancelDurationMs()
-{
-    int32_t fps = Config::FPS > 0 ? Config::FPS : 60;
-    return static_cast<uint32_t>(2000 / fps);
-}
-
 class Controller
 {
+private:
+    bool IsBoostOnRightTriggerActive()
+    {
+        const bool userConfigIsBoost = Config::RightTriggerAction == ERightTriggerAction::Boost;
+
+        if (!userConfigIsBoost || App::s_isWerehog)
+            return false;
+
+        // During a QTE prompt, keep the remap (and the boost aura) alive only while the
+        // right trigger is held continuously from before the prompt. If it isn't held,
+        // or gets released while the prompt is up, suspend the remap so the fabricated
+        // X can't answer the QTE and the real face button can.
+        bool qteOnScreen = IsQTEPromptOnScreen();
+        bool rtHeld = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= 30;
+        
+        if (!qteOnScreen)
+            qteRemapReleased = false;
+        else if (!rtHeld)
+            qteRemapReleased = true;
+
+        if (qteOnScreen && qteRemapReleased) 
+            return false;
+
+        return true;
+    }
+
+    bool DetermineChipPlayerStatus() {
+        auto pGameDocument = SWA::CGameDocument::GetInstance();
+        
+        if (pGameDocument == NULL) 
+            return false;
+
+        const char* stageName = pGameDocument->m_pMember->m_StageName.c_str();
+        const bool hasStage = stageName && strlen(stageName);
+
+        if (hasStage == false) 
+            return false;
+        
+        // There's no "BossDarkGaia1_2Air" so regex is NOT needeed.
+        const bool playingAsChip = !strcmp(stageName, "BossDarkGaia1_1Air");
+        
+        return playingAsChip;
+    }
+
+    uint32_t GetBoostCancelDurationMs()
+    {
+        int32_t fps = Config::FPS > 0 ? Config::FPS : 60;
+        return static_cast<uint32_t>(2000 / fps);
+    }
+
+    bool IsQTEPromptOnScreen()
+    {
+        // QTEPromptActiveMidAsmHook stamps this every frame a trick-QTE prompt is on
+        // screen; treat a recent stamp as "a QTE is waiting".
+        uint32_t last = App::s_lastQTEPromptMs;
+        if (last == 0)
+            return false;
+
+        uint32_t now = uint32_t(std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count());
+
+        return now - last < 250;
+    }
+
+    void ApplyChipControls()
+    {
+        auto& pad = state;
+
+        bool lbHeld = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER) != 0;
+        bool rbHeld = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) != 0;
+        bool ltPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) >> 7) >= 30;
+        bool rtPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= 30;
+
+        // Attack: the bumpers drive the guest triggers (vanilla LT & RT punches).
+        pad.bLeftTrigger = lbHeld ? 255 : 0;
+        pad.bRightTrigger = rbHeld ? 255 : 0;
+
+        // Guard: LT drives the guest left bumper (vanilla LB guard).
+        if (ltPulled)
+            pad.wButtons |= XAMINPUT_GAMEPAD_LEFT_SHOULDER;
+        else
+            pad.wButtons &= ~XAMINPUT_GAMEPAD_LEFT_SHOULDER;
+
+        // The physical right bumper is attack now; hide it from the guest.
+        pad.wButtons &= ~XAMINPUT_GAMEPAD_RIGHT_SHOULDER;
+    }
+
+
 public:
     SDL_GameController* controller{};
     SDL_Joystick* joystick{};
@@ -50,12 +109,14 @@ public:
     XAMINPUT_VIBRATION vibration{ 0, 0 };
     int index{};
 
-    // for when user sets Config::RightTriggerAction to ERightTriggerAction this
+    // For when user sets Config::RightTriggerAction to ERightTriggerAction this
     // increases stability to allow square/X to be recognised by the game while
     // right trigger is being pressed down especially when the user is moving
-    // the thumbsticks
+    // the thumbsticks.
     bool xWasHeldLastPoll{};
     uint32_t xCancelUntilTick{};
+    bool qteRemapReleased{}; // Handles the remap suspension. Resets when no prompt is on screen.
+    // bool chipIsActive{};
 
     Controller() = default;
 
@@ -162,6 +223,9 @@ public:
                 pad.bRightTrigger = 0;
 
             xWasHeldLastPoll = xHeldPhysically;
+
+            if (DetermineChipPlayerStatus())
+                ApplyChipControls();
         }
     }
 
@@ -220,6 +284,9 @@ public:
                 pad.bRightTrigger = 0;
 
             xWasHeldLastPoll = xHeldPhysically;
+
+            if (DetermineChipPlayerStatus())
+                ApplyChipControls();
         }
     }
 
