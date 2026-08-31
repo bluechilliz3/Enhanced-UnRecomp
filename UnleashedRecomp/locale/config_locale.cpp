@@ -236,7 +236,7 @@ CONFIG_DEFINE_ENUM_LOCALE(ERightTriggerAction)
         ELanguage::English,
         {
             { ERightTriggerAction::Drift, { "DRIFT", "Default: the right trigger acts as drift, matching the original Xbox 360/PS3 controls." } },
-            { ERightTriggerAction::Boost, { "BOOST/H.A", "EXPERIMENTAL: The right trigger acts as boost or homing attack. Drift is still available on the left trigger and X/Square still triggers boost too." } }
+            { ERightTriggerAction::Boost, { "BOOST", "The right trigger becomes the boost button. Drift stays on the left trigger, and X/Square still boosts too." } }
         }
     },
     {

@@ -11,12 +11,14 @@
 #define TRANSLATE_INPUT(S, X) SDL_GameControllerGetButton(controller, S) << FirstBitLow(X)
 #define VIBRATION_TIMEOUT_MS 5000
 
+static constexpr uint8_t BOOST_TRIGGER_THRESHOLD = 30;
+
 class Controller
 {
 private:
     bool IsBoostOnRightTriggerActive()
     {
-        const bool userConfigIsBoost = Config::RightTriggerAction == ERightTriggerAction::Boost;
+        bool userConfigIsBoost = Config::RightTriggerAction == ERightTriggerAction::Boost;
 
         if (!userConfigIsBoost || App::s_isWerehog)
             return false;
@@ -77,6 +79,21 @@ private:
         return now - last < 250;
     }
 
+    // Chip still disguise the right trigger as X for boost (their boost has
+    // no action-layer entry we can drive).
+    bool IsBossGuestXRemapSuspended()
+    {
+        bool qteOnScreen = IsQTEPromptOnScreen();
+        bool rtHeld = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= BOOST_TRIGGER_THRESHOLD;
+
+        if (!qteOnScreen)
+            qteRemapReleased = false;
+        else if (!rtHeld)
+            qteRemapReleased = true;
+
+        return qteOnScreen && qteRemapReleased;
+    }
+
     void ApplyChipControls()
     {
         auto& pad = state;
@@ -98,6 +115,60 @@ private:
 
         // The physical right bumper is attack now; hide it from the guest.
         pad.wButtons &= ~XAMINPUT_GAMEPAD_RIGHT_SHOULDER;
+    }
+
+    void ApplyRightTriggerBoost()
+    {
+        auto& pad = state;
+
+        bool boostOnRT = IsBoostOnRightTriggerActive();
+
+        if (!boostOnRT)
+        {
+            App::s_rtBoost.store(false, std::memory_order_relaxed);
+            return;
+        }
+
+        bool rtPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= BOOST_TRIGGER_THRESHOLD;
+
+        // Sonic & Super Sonic supports a more "native" way of pressing the right trigger for boosting
+        // while playing as the Gaia Colossus (Chip) still needs the guests inputs switched.
+        if (!DetermineChipPlayerStatus())
+        {
+            App::s_rtBoost.store(rtPulled, std::memory_order_relaxed);
+
+            if (rtPulled)
+                pad.bRightTrigger = 0;
+        }
+        else
+        {
+            App::s_rtBoost.store(false, std::memory_order_relaxed);
+
+            if (!IsBossGuestXRemapSuspended())
+            {
+                bool xHeldPhysically = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X) != 0;
+                bool xRisingEdge = xHeldPhysically && !xWasHeldLastPoll;
+
+                if (xRisingEdge && rtPulled)
+                    xCancelUntilTick = SDL_GetTicks() + GetBoostCancelDurationMs();
+
+                bool inCancelWindow = SDL_TICKS_PASSED(xCancelUntilTick, SDL_GetTicks());
+
+                if (inCancelWindow)
+                    pad.wButtons &= ~XAMINPUT_GAMEPAD_X;
+                else if (xHeldPhysically || rtPulled)
+                    pad.wButtons |= XAMINPUT_GAMEPAD_X;
+                else
+                    pad.wButtons &= ~XAMINPUT_GAMEPAD_X;
+
+                if (rtPulled)
+                    pad.bRightTrigger = 0;
+
+                xWasHeldLastPoll = xHeldPhysically;
+
+                ApplyChipControls();
+            }
+        }
     }
 
 
@@ -199,34 +270,7 @@ public:
         pad.bRightTrigger = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7;
 
 
-        
-        if (IsBoostOnRightTriggerActive())
-        {
-            bool xHeldPhysically = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X) != 0;
-            bool xRisingEdge = xHeldPhysically && !xWasHeldLastPoll;
-            bool rtPulled = pad.bRightTrigger >= 30; // TODO: change this to a pressure preference
-
-            // these checks are in place to improve responsiveness of square/X while right trigger is held down
-            if (xRisingEdge && rtPulled)
-                xCancelUntilTick = SDL_GetTicks() + GetBoostCancelDurationMs();
-
-            bool inCancelWindow = SDL_TICKS_PASSED(xCancelUntilTick, SDL_GetTicks());
-
-            if (inCancelWindow)
-                pad.wButtons &= ~XAMINPUT_GAMEPAD_X;
-            else if (xHeldPhysically || rtPulled)
-                pad.wButtons |= XAMINPUT_GAMEPAD_X;
-            else
-                pad.wButtons &= ~XAMINPUT_GAMEPAD_X;
-
-            if (rtPulled)
-                pad.bRightTrigger = 0;
-
-            xWasHeldLastPoll = xHeldPhysically;
-
-            if (DetermineChipPlayerStatus())
-                ApplyChipControls();
-        }
+        ApplyRightTriggerBoost();
     }
 
     void Poll()
@@ -258,36 +302,8 @@ public:
         pad.wButtons |= TRANSLATE_INPUT(SDL_CONTROLLER_BUTTON_X, XAMINPUT_GAMEPAD_X);
         pad.wButtons |= TRANSLATE_INPUT(SDL_CONTROLLER_BUTTON_Y, XAMINPUT_GAMEPAD_Y);
 
-        // when playing day stages keep the right trigger mirrored onto square/X
-        // so so the game knows the user is boosting. This will remove the actual
-        // right trigger from the game so sonic wouldn't drift
-        if (IsBoostOnRightTriggerActive())
-        {
-            bool xHeldPhysically = (pad.wButtons & XAMINPUT_GAMEPAD_X) != 0;
-            bool xRisingEdge = xHeldPhysically && !xWasHeldLastPoll;
-            uint8_t rtRaw = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7;
-            bool rtPulled = rtRaw >= 30; // TODO: change this to a pressure preference
 
-            // like in Poll() these checks are in place to improve responsiveness 
-            // of square/X while right trigger is held down
-            if (xRisingEdge && rtPulled)
-                xCancelUntilTick = SDL_GetTicks() + GetBoostCancelDurationMs();
-
-            bool inCancelWindow = SDL_TICKS_PASSED(xCancelUntilTick, SDL_GetTicks());
-
-            if (inCancelWindow)
-                pad.wButtons &= ~XAMINPUT_GAMEPAD_X;
-            else if (rtPulled)
-                pad.wButtons |= XAMINPUT_GAMEPAD_X;
-
-            if (rtPulled)
-                pad.bRightTrigger = 0;
-
-            xWasHeldLastPoll = xHeldPhysically;
-
-            if (DetermineChipPlayerStatus())
-                ApplyChipControls();
-        }
+        ApplyRightTriggerBoost();
     }
 
     void SetVibration(const XAMINPUT_VIBRATION& vibration)
