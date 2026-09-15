@@ -15,8 +15,8 @@
 
 using json = nlohmann::json;
 
-static const char *CHECK_URL = "https://api.github.com/repos/hedge-dev/UnleashedRecomp/releases/latest";
-static const char *VISIT_URL = "https://github.com/hedge-dev/UnleashedRecomp/releases/latest";
+static const char *CHECK_URL = "https://api.github.com/repos/bluechilliz3/Enhanced-UnRecomp/releases/latest";
+static const char *VISIT_URL = "https://github.com/bluechilliz3/Enhanced-UnRecomp/releases/latest";
 static const char *USER_AGENT = "UnleashedRecomp-Agent";
 
 static std::atomic<bool> g_updateCheckerInProgress = false;

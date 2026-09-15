@@ -158,7 +158,7 @@ int Window_OnSDLEvent(void*, SDL_Event* event)
 void GameWindow::Init(const char* sdlVideoDriver)
 {
 #ifdef __linux__
-    SDL_SetHint("SDL_APP_ID", "io.github.hedge_dev.unleashedrecomp");
+    SDL_SetHint("SDL_APP_ID", "io.github.bluechilliz3.enhancedunrecomp");
 #endif
 
     if (SDL_VideoInit(sdlVideoDriver) != 0 && sdlVideoDriver)
@@ -190,7 +190,7 @@ void GameWindow::Init(const char* sdlVideoDriver)
     if (!IsPositionValid())
         GameWindow::ResetDimensions();
 
-    s_pWindow = SDL_CreateWindow("Unleashed Recompiled", s_x, s_y, s_width, s_height, GetWindowFlags());
+    s_pWindow = SDL_CreateWindow("Enhanced UnRecomp", s_x, s_y, s_width, s_height, GetWindowFlags());
 
     if (IsFullscreen())
         SDL_ShowCursor(SDL_DISABLE);
@@ -295,7 +295,7 @@ const char* GameWindow::GetTitle()
             : "SONIC UNLEASHED";
     }
 
-    return "Unleashed Recompiled";
+    return "Enhanced UnRecomp";
 }
 
 void GameWindow::SetTitle(const char* title)

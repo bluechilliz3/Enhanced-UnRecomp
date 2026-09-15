@@ -11,7 +11,7 @@
 #define TRANSLATE_INPUT(S, X) SDL_GameControllerGetButton(controller, S) << FirstBitLow(X)
 #define VIBRATION_TIMEOUT_MS 5000
 
-static constexpr uint8_t BOOST_TRIGGER_THRESHOLD = 30;
+static constexpr uint8_t TRIGGER_TO_DIGITAL_THRESHOLD = 30;
 
 class Controller
 {
@@ -28,7 +28,7 @@ private:
         // or gets released while the prompt is up, suspend the remap so the fabricated
         // X can't answer the QTE and the real face button can.
         bool qteOnScreen = IsQTEPromptOnScreen();
-        bool rtHeld = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= 30;
+        bool rtHeld = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= TRIGGER_TO_DIGITAL_THRESHOLD;
         
         if (!qteOnScreen)
             qteRemapReleased = false;
@@ -59,7 +59,7 @@ private:
         return playingAsChip;
     }
 
-    uint32_t GetBoostCancelDurationMs()
+    uint32_t GetGuestRemapCancelDurationMs()
     {
         int32_t fps = Config::FPS > 0 ? Config::FPS : 60;
         return static_cast<uint32_t>(2000 / fps);
@@ -84,7 +84,7 @@ private:
     bool IsBossGuestXRemapSuspended()
     {
         bool qteOnScreen = IsQTEPromptOnScreen();
-        bool rtHeld = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= BOOST_TRIGGER_THRESHOLD;
+        bool rtHeld = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= TRIGGER_TO_DIGITAL_THRESHOLD;
 
         if (!qteOnScreen)
             qteRemapReleased = false;
@@ -100,8 +100,8 @@ private:
 
         bool lbHeld = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER) != 0;
         bool rbHeld = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) != 0;
-        bool ltPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) >> 7) >= 30;
-        bool rtPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= 30;
+        bool ltPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) >> 7) >= TRIGGER_TO_DIGITAL_THRESHOLD;
+        bool rtPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= TRIGGER_TO_DIGITAL_THRESHOLD;
 
         // Attack: the bumpers drive the guest triggers (vanilla LT & RT punches).
         pad.bLeftTrigger = lbHeld ? 255 : 0;
@@ -129,7 +129,7 @@ private:
             return;
         }
 
-        bool rtPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= BOOST_TRIGGER_THRESHOLD;
+        bool rtPulled = uint8_t(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) >> 7) >= TRIGGER_TO_DIGITAL_THRESHOLD;
 
         // Sonic & Super Sonic supports a more "native" way of pressing the right trigger for boosting
         // while playing as the Gaia Colossus (Chip) still needs the guests inputs switched.
@@ -150,7 +150,7 @@ private:
                 bool xRisingEdge = xHeldPhysically && !xWasHeldLastPoll;
 
                 if (xRisingEdge && rtPulled)
-                    xCancelUntilTick = SDL_GetTicks() + GetBoostCancelDurationMs();
+                    xCancelUntilTick = SDL_GetTicks() + GetGuestRemapCancelDurationMs();
 
                 bool inCancelWindow = SDL_TICKS_PASSED(xCancelUntilTick, SDL_GetTicks());
 
