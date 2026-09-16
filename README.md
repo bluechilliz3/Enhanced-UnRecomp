@@ -1,23 +1,23 @@
-<p align="leading">
-    <img src="https://raw.githubusercontent.com/hedge-dev/UnleashedRecompResources/refs/heads/main/images/logo/Logo.png" width="512"/>
-</p>
-
----
-
-Enhanced-UnRecomp is a derivation of Unleashed Recompiled. It contains enahancements on top of [hedge-dev's Unleashed Recompiled](github.com/hedge-dev/UnleashedRecomp).
+Enhanced-UnRecomp is a derivation of Unleashed Recompiled. It contains enahancements on top of [hedge-dev's Unleashed Recompiled](https://github.com/hedge-dev/UnleashedRecomp).
 
 **This project does not include any game assets. You must provide the files from your own legally acquired copy of the game to install or build Enhanced-UnRecomp.**
 
 ## Table of Contents
 
 - [Features](#features)
+
 - [Minimum System Requirements](#minimum-system-requirements)
-- [How do I run Enhanced-UnRecomp?](#how-do-i-run-enhanced-unrecomp?)
+
+- [How do I run Enhanced-UnRecomp?](#how-do-i-run-enhanced-unrecomp)
 
 - [Update Roadmap](#update-roadmap)
+
 - [Known Issues](#known-issues)
+
 - [FAQ](#faq)
+
 - [Building](#building)
+
 - [Credits](#credits)
 
 ## Features
@@ -28,9 +28,7 @@ Like in the modern games you can natively use Right Trigger to boost! Enable it 
 
 Here's a video example
 
-```
 [![Right Trigger Boost video example](https://img.youtube.com/vi/D4bx5LojE20/0.jpg)](https://www.youtube.com/watch?v=D4bx5LojE20)
-```
 
 ## Minimum System Requirements
 
@@ -119,7 +117,6 @@ You will find the save data under the `save` folder (or `mlsave`, if using Hedge
 Updating the game can be done by simply fetching the updated project then running the build. **Your save data and configuration will not be lost.** You won't need to reinstall the game, as the game files will always remain the same across versions of Enhanced-UnRecomp & hedge-dev's Unleashed Recompiled.
 
 > [!CAUTION]
-> 
 > Your save & mods are interchangable across hedge-dev's Unleashed Recompiled & Enhanced-UnRecomp but the extra settings from Enhanced-UnRecomp **will be wiped** (such as `RightTriggerAction`) if you run hedge-dev's Unleashed Recompiled (or other forks of Unleashed Recompiled that doesn't support the extra settings).
 
 ## How can I force the game to store the save data and configuration in the installation folder?

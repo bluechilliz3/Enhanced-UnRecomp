@@ -177,5 +177,17 @@ sudo port install cmake ninja pkg-config
    
    ```bash
    cd ./out/build/macos-release/UnleashedRecomp
-   open -a UnleashedRecomp.app
+   open -a "Enhanced UnRecomp.app"
    ```
+
+> [!NOTE]
+> 
+> macOS may block the app from running, so try **control-clicking** (or two finger click), then click "Open" then *another error message is shown*. Then goto **System Settings** > *Privacy & Security* then scroll down until it says somthing about "Enhanced UnRecomp.app was blocked from being opened to protect your privacy". Feel free to click "Open Anyways" and macOS will ask fir your Touch ID.
+> 
+> However if you get the "The app is damaged error", you'd have to either run `xattr -d com.apple.quarantine "Enhanced UnRecomp.app"` **or** `codesign -fs - "Enhanced UnRecomp.app"` (maybe both depending your system).
+
+4. Once you know it's working  move the built app to your ***Applications*** folder
+
+> [!TIP]
+> 
+> Run `open .` (with that dot) and a Finder window will reveal where the app is built so yo can drag it to your **Applications**

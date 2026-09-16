@@ -224,7 +224,7 @@ PPC_FUNC(sub_82391408)
     g_inDiveDecision = false;
 }
 
-/* --- super Sonic (final boss) boost ---------------------------------------------------
+/* --- Super Sonic (final boss) boost ---------------------------------------------------
    the final boss runs Super Sonic through two flight modes, each its own state machine
    with a "tapped -> start" flight decision and a "held -> sustain" boost update, both
    reading boost-button action 4, so RT starts and sustains Super Sonic's
