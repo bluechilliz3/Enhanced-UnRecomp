@@ -30,6 +30,16 @@ Here's a video example
 
 [![Right Trigger Boost video example](https://img.youtube.com/vi/D4bx5LojE20/0.jpg)](https://www.youtube.com/watch?v=D4bx5LojE20)
 
+### No BGM Restart on Respawn
+
+In the modern games the music longer restarts, so this is now an option here! If you played the modern games you'll less like to restart the stage as the grove hasn't moved.
+
+You change `ModsDB.ini` in the `mods` folder (on the [UnleashedRecomp configuration folder](#where-is-the-save-data-and-configuration-file-stored) and add `CodeX="DisableMusicRestartOnDeath"` under the `[Codes]` section and update `CodeCount=X+1`.
+
+> [!TIP]
+> 
+> If for example you added `Code4="DisableMusicRestartOnDeath"` you change `CodeCount=4` to `CodeCount=5`.
+
 ## Minimum System Requirements
 
 - CPU with support for the AVX instruction set:
@@ -71,10 +81,6 @@ Here's a video example
 ## Bobsleigh Boosting
 
 Keep on boosting while on the bobsleigh in stages like Cool Edge Act 1 or the second day section of Eggmanland! Never stay out of that momentum like in Unwiished.
-
-## No BGM Restart on Respawn
-
-In the modern games the music longer restarts, so it's in the roadmap! If you played the modern games you'll less like to restart the stage as the grove hasn't moved.
 
 ## More Colors on Controller LED
 
