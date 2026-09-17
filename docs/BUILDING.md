@@ -182,7 +182,7 @@ sudo port install cmake ninja pkg-config
 
 > [!NOTE]
 > 
-> macOS may block the app from running, so try **control-clicking** (or two finger click), then click "Open" then *another error message is shown*. Then goto **System Settings** > *Privacy & Security* then scroll down until it says somthing about "Enhanced UnRecomp.app was blocked from being opened to protect your privacy". Feel free to click "Open Anyways" and macOS will ask fir your Touch ID.
+> macOS may block the app from running, so try **control-clicking** (or two finger click), then click "Open" then *another error message is shown*. Then goto **System Settings** > *Privacy & Security* then scroll down until it says something about "Enhanced UnRecomp.app was blocked from being opened to protect your privacy". Feel free to click "Open Anyways" and macOS will ask for your Touch ID.
 > 
 > However if you get the "The app is damaged error", you'd have to either run `xattr -d com.apple.quarantine "Enhanced UnRecomp.app"` **or** `codesign -fs - "Enhanced UnRecomp.app"` (maybe both depending your system).
 

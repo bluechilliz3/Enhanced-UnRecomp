@@ -1,4 +1,4 @@
-Enhanced-UnRecomp is a derivation of Unleashed Recompiled. It contains enahancements on top of [hedge-dev's Unleashed Recompiled](https://github.com/hedge-dev/UnleashedRecomp).
+Enhanced-UnRecomp is a derivation of Unleashed Recompiled. It contains enhancements on top of [hedge-dev's Unleashed Recompiled](https://github.com/hedge-dev/UnleashedRecomp).
 
 **This project does not include any game assets. You must provide the files from your own legally acquired copy of the game to install or build Enhanced-UnRecomp.**
 
@@ -56,7 +56,7 @@ Here's a video example
 
 1. You run hedge-dev's Unleashed Recompiled to install the assets of the game if you haven't played the game on PC before. You can find [their guide on their repo](https://github.com/hedge-dev/UnleashedRecomp#how-to-install).
 
-2. You need build this project. Go to the [building instruction](/docs/BUILDING.md). 
+2. You need to build this project. Go to the [building instruction](/docs/BUILDING.md). 
 
 3. Run the game, enjoy!
 
@@ -74,7 +74,7 @@ Keep on boosting while on the bobsleigh in stages like Cool Edge Act 1 or the se
 
 ## No BGM Restart on Respawn
 
-In the morden games the music longer restarts, so it's in the roadmap! If you played the modern games you'll less like to restart the stage as the grove hasn't moved.
+In the modern games the music longer restarts, so it's in the roadmap! If you played the modern games you'll less like to restart the stage as the grove hasn't moved.
 
 ## More Colors on Controller LED
 
@@ -117,7 +117,7 @@ You will find the save data under the `save` folder (or `mlsave`, if using Hedge
 Updating the game can be done by simply fetching the updated project then running the build. **Your save data and configuration will not be lost.** You won't need to reinstall the game, as the game files will always remain the same across versions of Enhanced-UnRecomp & hedge-dev's Unleashed Recompiled.
 
 > [!CAUTION]
-> Your save & mods are interchangable across hedge-dev's Unleashed Recompiled & Enhanced-UnRecomp but the extra settings from Enhanced-UnRecomp **will be wiped** (such as `RightTriggerAction`) if you run hedge-dev's Unleashed Recompiled (or other forks of Unleashed Recompiled that doesn't support the extra settings).
+> Your save & mods are interchangeable across hedge-dev's Unleashed Recompiled & Enhanced-UnRecomp but the extra settings from Enhanced-UnRecomp **will be wiped** (such as `RightTriggerAction`) if you run hedge-dev's Unleashed Recompiled (or other forks of Unleashed Recompiled that doesn't support the extra settings).
 
 ## How can I force the game to store the save data and configuration in the installation folder?
 
@@ -150,4 +150,4 @@ If you wish to move this data to another location, you can do so by creating a s
 
 ## Unleashed Recompiled
 
-This project won't be possible without hedge-dev! Please look at their [offical github page](https://github.com/hedge-dev/UnleashedRecomp#credits) for the thanks they'd want to give to their own individuals and team.
+This project won't be possible without hedge-dev! Please look at their [official Github page](https://github.com/hedge-dev/UnleashedRecomp#credits) for the thanks they'd want to give to their own individuals and team.
