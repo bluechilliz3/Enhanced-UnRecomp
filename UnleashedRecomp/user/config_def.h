@@ -83,6 +83,7 @@ CONFIG_DEFINE_HIDDEN("Codes", bool, DisableDLCIcon, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, DisableDPadMovement, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, DisableDWMRoundedCorners, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, DisableLowResolutionFontOnCustomUI, false);
+CONFIG_DEFINE_HIDDEN("Codes", bool, DisableMusicRestartOnDeath, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, EnableEventCollisionDebugView, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, EnableGIMipLevelDebugView, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, EnableObjectCollisionDebugView, false);

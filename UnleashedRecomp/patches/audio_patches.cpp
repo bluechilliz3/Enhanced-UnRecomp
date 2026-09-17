@@ -93,3 +93,35 @@ bool MakeCueSheetDataMidAsmHook(PPCRegister& r31)
 
     return false;
 }
+
+// DisableMusicRestartOnDeath.
+//
+// A flag that the sound manager's handler consumes.
+static bool g_skipNextBgmRestart;
+
+PPC_FUNC_IMPL(__imp__sub_827B62E0);
+PPC_FUNC(sub_827B62E0)
+{
+    // r4 = restart command: byte +29 gates the broadcast, +24 = message param.
+    if (Config::DisableMusicRestartOnDeath &&
+        ctx.r4.u32 && PPC_LOAD_U8(ctx.r4.u32 + 29) != 0 && PPC_LOAD_U32(ctx.r4.u32 + 24) == 1)
+    {
+        g_skipNextBgmRestart = true;
+    }
+
+    __imp__sub_827B62E0(ctx, base);
+}
+
+PPC_FUNC_IMPL(__imp__sub_82B43558);
+PPC_FUNC(sub_82B43558)
+{
+    if (g_skipNextBgmRestart)
+    {
+        g_skipNextBgmRestart = false;
+
+        if (PPC_LOAD_U32(ctx.r4.u32 + 24) == 1)
+            return;
+    }
+
+    __imp__sub_82B43558(ctx, base);
+}
