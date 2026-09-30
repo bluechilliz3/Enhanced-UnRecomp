@@ -28,7 +28,7 @@ Like in the modern games you can natively use Right Trigger to boost! Enable it 
 
 https://github.com/user-attachments/assets/6b23e4e8-d364-4c31-bce6-3406b643c1da
 
-Here's a video example using right trigger to boos
+Here's a video example using right trigger to boost.
 
 [![Right Trigger Boost video example](https://img.youtube.com/vi/D4bx5LojE20/0.jpg)](https://www.youtube.com/watch?v=D4bx5LojE20)
 > [!NOTE]
