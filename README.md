@@ -26,9 +26,14 @@ Enhanced-UnRecomp is a derivation of Unleashed Recompiled. It contains enhanceme
 
 Like in the modern games you can natively use Right Trigger to boost! Enable it in the options under the <mark>Input</mark> tab and enjoy. No more needing to flip between controller remapping software when you swap between Day & Night Sonic (especially in Eggmanland).
 
-Here's a video example
+https://github.com/user-attachments/assets/6b23e4e8-d364-4c31-bce6-3406b643c1da
+
+Here's a video example using right trigger to boos
 
 [![Right Trigger Boost video example](https://img.youtube.com/vi/D4bx5LojE20/0.jpg)](https://www.youtube.com/watch?v=D4bx5LojE20)
+> [!NOTE]
+> The video example was taken before the icon to press R2/RT to boost. When you run the build the prompt will update.
+
 
 ### No BGM Restart on Respawn
 
