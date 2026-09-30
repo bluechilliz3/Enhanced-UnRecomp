@@ -57,16 +57,19 @@ cp ~/.config/UnleashedRecomp/game/shader.ar ./UnleashedRecompLib/private/
 cp ~/.config/UnleashedRecomp/game/default.xexp ./UnleashedRecompLib/private/
 ```
 
+#### Flatpak
 > [!NOTE]
 > 
 > If using the flatpak version of hedge-dev's Unleashed Recompiled, you'll need to copy your data from `~/.var/app/io.github.hedge_dev.unleashedrecomp/data` first.
 
+Skip this part if you're not using the flatpak version.
+
 ### macOS
 
 ```bash
-cp ~/Library/"Application Support"/UnleashedRecomp/game/default.xex ./UnleashedRecompLib/private/
-cp ~/Library/"Application Support"/UnleashedRecomp/game/shader.ar ./UnleashedRecompLib/private/
-cp ~/Library/"Application Support"/UnleashedRecomp/game/default.xexp ./UnleashedRecompLib/private/
+cp ~/Library/Application\ Support/UnleashedRecomp/game/default.xex ./UnleashedRecompLib/private/
+cp ~/Library/Application\ Support/UnleashedRecomp/game/shader.ar ./UnleashedRecompLib/private/
+cp ~/Library/Application\ Support/UnleashedRecomp/game/default.xexp ./UnleashedRecompLib/private/
 ```
 
 ## 3. Install Dependencies

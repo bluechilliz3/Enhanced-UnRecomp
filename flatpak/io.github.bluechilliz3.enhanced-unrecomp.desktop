@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Enhanced UnRecomp
+Exec=/app/bin/enhanced-unrecomp
+Type=Application
+Icon=io.github.bluechilliz3.enhanced-unrecomp
+Categories=Game;
+Comment=Static recompilation of Sonic Unleashed with further ehancements.
+MimeType=x-scheme-handler/unleashedrecomp

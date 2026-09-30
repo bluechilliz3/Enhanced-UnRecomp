@@ -161,7 +161,7 @@ jobs:
     name: Build Flatpak
     runs-on: ubuntu-24.04
     env:
-      FLATPAK_ID: io.github.hedge_dev.unleashedrecomp
+      FLATPAK_ID: io.github.bluechilliz3.enhanced-unrecomp
 
     steps:
       - name: Checkout Repository
