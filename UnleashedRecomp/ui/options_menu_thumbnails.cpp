@@ -35,6 +35,10 @@
 #include <res/images/options_menu/thumbnails/movie_scale_fill.dds.h>
 #include <res/images/options_menu/thumbnails/music_attenuation.dds.h>
 #include <res/images/options_menu/thumbnails/music_volume.dds.h>
+#include <res/images/options_menu/thumbnails/right_trigger_action_boost_ps.dds.h>
+#include <res/images/options_menu/thumbnails/right_trigger_action_boost_xb.dds.h>
+#include <res/images/options_menu/thumbnails/right_trigger_action_drift_ps.dds.h>
+#include <res/images/options_menu/thumbnails/right_trigger_action_drift_xb.dds.h>
 #include <res/images/options_menu/thumbnails/shadow_resolution_x512.dds.h>
 #include <res/images/options_menu/thumbnails/shadow_resolution_x1024.dds.h>
 #include <res/images/options_menu/thumbnails/shadow_resolution_x2048.dds.h>
@@ -65,6 +69,10 @@ static std::unique_ptr<GuestTexture> g_vibrationXBThumbnail;
 static std::unique_ptr<GuestTexture> g_vibrationPSThumbnail;
 static std::unique_ptr<GuestTexture> g_backgroundInputXBThumbnail;
 static std::unique_ptr<GuestTexture> g_backgroundInputPSThumbnail;
+static std::unique_ptr<GuestTexture> g_rightTriggerActionBoostXBThumbnail;
+static std::unique_ptr<GuestTexture> g_rightTriggerActionBoostPSThumbnail;
+static std::unique_ptr<GuestTexture> g_rightTriggerActionDriftXBThumbnail;
+static std::unique_ptr<GuestTexture> g_rightTriggerActionDriftPSThumbnail;
 
 static std::unordered_map<const IConfigDef*, std::unique_ptr<GuestTexture>> g_configThumbnails;
 
@@ -90,6 +98,10 @@ void LoadThumbnails()
     g_vibrationPSThumbnail = LOAD_ZSTD_TEXTURE(g_vibration_ps);
     g_backgroundInputXBThumbnail = LOAD_ZSTD_TEXTURE(g_allow_background_input_xb);
     g_backgroundInputPSThumbnail = LOAD_ZSTD_TEXTURE(g_allow_background_input_ps);
+    g_rightTriggerActionBoostXBThumbnail = LOAD_ZSTD_TEXTURE(g_right_trigger_action_boost_xb);
+    g_rightTriggerActionBoostPSThumbnail = LOAD_ZSTD_TEXTURE(g_right_trigger_action_boost_ps);
+    g_rightTriggerActionDriftXBThumbnail = LOAD_ZSTD_TEXTURE(g_right_trigger_action_drift_xb);
+    g_rightTriggerActionDriftPSThumbnail = LOAD_ZSTD_TEXTURE(g_right_trigger_action_drift_ps);
 
     g_configThumbnails[&Config::Language] = LOAD_ZSTD_TEXTURE(g_language);
     g_configThumbnails[&Config::VoiceLanguage] = LOAD_ZSTD_TEXTURE(g_voice_language);
@@ -202,6 +214,13 @@ GuestTexture* GetThumbnail(const IConfigDef* cfg)
         else if (cfg == &Config::AllowBackgroundInput)
         {
             texture = isPlayStation ? g_backgroundInputPSThumbnail.get() : g_backgroundInputXBThumbnail.get();
+        }
+        else if (cfg == &Config::RightTriggerAction)
+        {
+            if (Config::RightTriggerAction == ERightTriggerAction::Boost)
+                texture = isPlayStation ? g_rightTriggerActionBoostPSThumbnail.get() : g_rightTriggerActionBoostXBThumbnail.get();
+            else
+                texture = isPlayStation ? g_rightTriggerActionDriftPSThumbnail.get() : g_rightTriggerActionDriftXBThumbnail.get();
         }
         else if (cfg == &Config::TimeOfDayTransition)
         {

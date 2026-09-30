@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.hedge_dev.unleashedrecomp</id>
+  <id>io.github.bluechilliz3.enhanced-unrecomp</id>
   
-  <name>Unleashed Recompiled</name>
+  <name>Enhanced UnRecomp</name>
   <summary>An unofficial PC port of Sonic Unleashed.</summary>
   
   <metadata_license>CC0-1.0</metadata_license>
@@ -18,9 +18,9 @@
     <p>
       An unofficial PC port of the Xbox 360 version of Sonic Unleashed created through the process of static recompilation.
 
-      https://github.com/hedge-dev/UnleashedRecomp
+      https://github.com/bluechilliz3/Enhanced-UnRecomp
     </p>
   </description>
   
-  <launchable type="desktop-id">io.github.hedge_dev.unleashedrecomp.desktop</launchable>
+  <launchable type="desktop-id">io.github.bluechilliz3.enhanced-unrecomp.desktop</launchable>
 </component>

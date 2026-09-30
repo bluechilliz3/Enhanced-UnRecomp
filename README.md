@@ -34,7 +34,9 @@ Here's a video example
 
 In the modern games the music longer restarts, so this is now an option here! If you played the modern games you'll less like to restart the stage as the grove hasn't moved.
 
-You change `ModsDB.ini` in the `mods` folder (on the [UnleashedRecomp configuration folder](#where-is-the-save-data-and-configuration-file-stored) and add `CodeX="DisableMusicRestartOnDeath"` under the `[Codes]` section and update `CodeCount=X+1`.
+To turn on the setting, add the `ExtraCodes.hmm` file to your `mods` folder in the [UnleashedRecomp configuration folder](#where-is-the-save-data-and-configuration-file-stored) then restart the HedgeModManager then the setting should show under the codes tab. You can download the *hmm* file in the [releases tab](https://github.com/bluechilliz3/Enhanced-UnRecomp/releases).
+
+If that doesn't work you can change `ModsDB.ini` in the `mods` folder (on the [UnleashedRecomp configuration folder](#where-is-the-save-data-and-configuration-file-stored) and add `CodeX="DisableMusicRestartOnDeath"` under the `[Codes]` section and update `CodeCount=X+1`.
 
 > [!TIP]
 > 
@@ -144,9 +146,23 @@ The second argument will be passed directly to SDL as a hint to try to initializ
 
 ## Where is the game data for the Flatpak version installed?
 
-Given it is not possible to run the game where the Flatpak is stored, the game data will be installed to `~/.var/app/io.github.hedge_dev.unleashedrecomp/data`. The Flatpak build will only recognize this directory as valid. Feel free to reuse this data directory with a native Linux build if you wish to switch in the future.
+Given it is not possible to run the game where the Flatpak is stored, the game data will be installed to `~/.var/app/io.github.bluechilliz3.enhancedunrecomp/data`. The Flatpak build will only recognize this directory as valid. Feel free to reuse this data directory with a native Linux build if you wish to switch in the future.
 
 If you wish to move this data to another location, you can do so by creating a symlink from this directory to the one where you'll migrate your installation to.
+
+> [!WARNING]
+>
+> This project ships its own Flatpak under a different app ID than hedge-dev's Unleashed Recompiled. Because the Flatpak data directory is derived from the app ID, game data installed by an earlier build stays at the old path and this build will not see it — the game will appear to have lost all of its data and ask you to reinstall. To sync the a previous installation run the symlink command:
+>
+> ```bash
+> ln -s ~/.var/app/io.github.hedge_dev.unleashedrecomp/data ~/.var/app/io.github.bluechilliz3.enhancedunrecomp/data
+> ```
+If unfortunately your system or flatpak configuration doesn't allow for syncing in between forks. You have to copy the data manually (this will copy the game files and mods)
+```bash
+# Only run if above command doesn't work.
+cp -a ~/.var/app/io.github.hedge_dev.unleashedrecomp/data ~/.var/app/.github.bluechilliz3.enhancedunrecomp/data
+```
+The copy command *above* is unnecessary if Enhanced UnRecomp can see your saves and boot into the game using the `ln` command. With the symlink command (`ln`) your linux filesystem will automatically keep EnhancedUnRecomp and hedge-dev's Unleashed Recompiled user data up-to-date.
 
 # Building
 
