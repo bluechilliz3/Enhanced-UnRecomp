@@ -1,5 +1,6 @@
 #include <api/SWA.h>
 #include <app.h>
+#include <ui/bobsleigh_boost_overlay.h>
 #include <ui/game_window.h>
 #include <user/achievement_manager.h>
 #include <user/persistent_storage_manager.h>
@@ -126,7 +127,7 @@ void ChipOverlayCsdPatchMidAsmHook(PPCRegister& r8)
     *(be<float>*)(base + 0x3824 + 0x10) = kAttackR.y;
 
     // The rendered shape comes from each cast's baked pixel box (u32 width at +0x58,
-    // height at +0x5C) — the art is fitted into it, which is what stretched the
+    // height at +0x5C) - the art is fitted into it, which is what stretched the
     // swapped icons. Give each cast the box of the art it now shows: the guard cast
     // drops from the 80x40 bumper box to the 40x40 trigger box, the attack casts
     // grow from 40x40 to 80x40.
@@ -282,6 +283,96 @@ PPC_FUNC(sub_82B4DB48)
     }
 
     __imp__sub_82B4DB48(ctx, base);
+}
+
+// Bobsleigh Boost.
+//
+// The engine support boosting under external control though: the player's
+// ProcessMessage (sub_8236DFF0) handles MsgStartBoostInExternalControl 
+// (sub_82354258) and MsgFinishBoostInExternalControl (sub_823542A8),
+// which begin/end the regular boost on the player speed context. 
+//
+// NOTE: engaging the real boost is deliberately "buggy but fun". Boosting
+// Sonic in the sled drains the boost gauge and, because his collision response
+// changes, a dash-ramp or a hit while boosting can eject him from the sled.
+// Isolating just the aura/voice avoided the ejection but the boost voice/whoosh
+// cues are not resident in the bobsleigh's sound bank, so the full boost is
+// used for the better feel.
+static bool g_isBobsleighBoosting;
+
+// Mirrors MsgStartBoostInExternalControl (sub_82354258 = sub_82377628 +
+// sub_82377998) and MsgFinishBoostInExternalControl (sub_823542A8 =
+// sub_8236F780 + sub_82377BD0) on the player speed context.
+static void SetBobsleighBoost(bool active)
+{
+    if (g_isBobsleighBoosting == active)
+        return;
+
+    g_isBobsleighBoosting = active;
+
+    auto pContext = SWA::Player::CSonicContext::GetInstance();
+
+    if (!pContext)
+        return;
+
+    if (!GuestToHostFunction<bool>(sub_823166E0, pContext))
+        return;
+
+    if (active)
+    {
+        GuestToHostFunction<void>(sub_82377628, pContext);
+        GuestToHostFunction<void>(sub_82377998, pContext, 1);
+    }
+    else
+    {
+        GuestToHostFunction<void>(sub_8236F780, pContext);
+        GuestToHostFunction<void>(sub_82377BD0, pContext);
+    }
+}
+
+// CObjBobsleigh drive function, shared by its Mode3D/Mode2D/Whale state updates:
+// sub_8266F538(physics body [this+396], f1 = target speed, f2 = acceleration,
+// f3 = delta time). Mode3D drives with (60, 50), Mode2D with (30, 25).
+// Runs every frame while riding, so it also drives the boost edge detection.
+PPC_FUNC_IMPL(__imp__sub_8266F538);
+PPC_FUNC(sub_8266F538)
+{
+    if (Config::AllowBobsleighBoost)
+    {
+        bool boostHeld = false;
+
+        if (auto pInputState = SWA::CInputState::GetInstance())
+            boostHeld = pInputState->GetPadState().IsDown(SWA::eKeyState_X);
+
+        boostHeld = boostHeld || App::s_rtBoost.load(std::memory_order_relaxed);
+
+        SetBobsleighBoost(boostHeld);
+
+        // Feed the recording watermark: this runs every frame during a ride, so it
+        // also tells the overlay the ride is still active.
+        BobsleighBoostOverlay::SetBoosting(boostHeld);
+
+        if (boostHeld)
+        {
+            ctx.f1.f64 *= BobsleighBoostOverlay::Coefficient;
+            ctx.f2.f64 *= BobsleighBoostOverlay::Coefficient;
+        }
+    }
+
+    __imp__sub_8266F538(ctx, base);
+}
+
+// Player's MsgFinishExternalControl handler. External control ends when the
+// ride ends, so ending the boost here guarantees the boost state can't leak 
+// onto on-foot Sonic.
+PPC_FUNC_IMPL(__imp__sub_82354048);
+PPC_FUNC(sub_82354048)
+{
+    SetBobsleighBoost(false);
+
+    BobsleighBoostOverlay::EndRide();
+
+    __imp__sub_82354048(ctx, base);
 }
 
 // DLC save data flag check.
