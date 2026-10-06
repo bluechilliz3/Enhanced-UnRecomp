@@ -47,6 +47,16 @@ If that doesn't work you can change `ModsDB.ini` in the `mods` folder (on the [U
 > 
 > If for example you added `Code4="DisableMusicRestartOnDeath"` you change `CodeCount=4` to `CodeCount=5`.
 
+## Bobsleigh Boosting
+
+Keep on boosting while on the bobsleigh in stages like Cool Edge Act 1 or the second day section of Eggmanland! Never stay out of that momentum like in Unwiished.
+
+You add `CodeX="DisableMusicRestartOnDeath"` like you'd do with `DisableMusicRestartOnDeath`.
+
+> [!NOTE]
+> 
+> To preserve speedrunning publications, a watermark is added when boosing on the bobsleigh is used. It shows the coefficient used compared to using the bobsleigh normally.
+
 ## Minimum System Requirements
 
 - CPU with support for the AVX instruction set:
@@ -85,9 +95,9 @@ If that doesn't work you can change `ModsDB.ini` in the `mods` folder (on the [U
 
 # Update Roadmap
 
-## Bobsleigh Boosting
+## Enermy Kill Counter on all Stages
 
-Keep on boosting while on the bobsleigh in stages like Cool Edge Act 1 or the second day section of Eggmanland! Never stay out of that momentum like in Unwiished.
+Using the existing hot dog stage system, see how many enemies you killed on any action stage.
 
 ## More Colors on Controller LED
 
@@ -156,17 +166,20 @@ Given it is not possible to run the game where the Flatpak is stored, the game d
 If you wish to move this data to another location, you can do so by creating a symlink from this directory to the one where you'll migrate your installation to.
 
 > [!WARNING]
->
+> 
 > This project ships its own Flatpak under a different app ID than hedge-dev's Unleashed Recompiled. Because the Flatpak data directory is derived from the app ID, game data installed by an earlier build stays at the old path and this build will not see it — the game will appear to have lost all of its data and ask you to reinstall. To sync the a previous installation run the symlink command:
->
+> 
 > ```bash
 > ln -s ~/.var/app/io.github.hedge_dev.unleashedrecomp/data ~/.var/app/io.github.bluechilliz3.enhancedunrecomp/data
 > ```
-If unfortunately your system or flatpak configuration doesn't allow for syncing in between forks. You have to copy the data manually (this will copy the game files and mods)
+> 
+> If unfortunately your system or flatpak configuration doesn't allow for syncing in between forks. You have to copy the data manually (this will copy the game files and mods)
+
 ```bash
 # Only run if above command doesn't work.
 cp -a ~/.var/app/io.github.hedge_dev.unleashedrecomp/data ~/.var/app/.github.bluechilliz3.enhancedunrecomp/data
 ```
+
 The copy command *above* is unnecessary if Enhanced UnRecomp can see your saves and boot into the game using the `ln` command. With the symlink command (`ln`) your linux filesystem will automatically keep EnhancedUnRecomp and hedge-dev's Unleashed Recompiled user data up-to-date.
 
 # Building
