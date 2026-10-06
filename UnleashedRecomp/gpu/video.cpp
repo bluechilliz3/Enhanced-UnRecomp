@@ -19,6 +19,7 @@
 #include <SWA.h>
 #include <ui/achievement_menu.h>
 #include <ui/achievement_overlay.h>
+#include <ui/bobsleigh_boost_overlay.h>
 #include <ui/button_guide.h>
 #include <ui/fader.h>
 #include <ui/imgui_utils.h>
@@ -1379,6 +1380,7 @@ static void CreateImGuiBackend()
     InitImGuiUtils();
     AchievementMenu::Init();
     AchievementOverlay::Init();
+    BobsleighBoostOverlay::Init();
     ButtonGuide::Init();
     MessageWindow::Init();
     OptionsMenu::Init();
@@ -2591,6 +2593,7 @@ static void DrawImGui()
     ImGui::End();
 #endif
 
+    BobsleighBoostOverlay::Draw();
     AchievementMenu::Draw();
     OptionsMenu::Draw();
     AchievementOverlay::Draw();
