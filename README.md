@@ -31,9 +31,9 @@ https://github.com/user-attachments/assets/6b23e4e8-d364-4c31-bce6-3406b643c1da
 Here's a video example using right trigger to boost.
 
 [![Right Trigger Boost video example](https://img.youtube.com/vi/D4bx5LojE20/0.jpg)](https://www.youtube.com/watch?v=D4bx5LojE20)
+
 > [!NOTE]
 > The video example was taken before the icon to press R2/RT to boost. When you run the build the prompt will update.
-
 
 ### No BGM Restart on Respawn
 
@@ -51,11 +51,15 @@ If that doesn't work you can change `ModsDB.ini` in the `mods` folder (on the [U
 
 Keep on boosting while on the bobsleigh in stages like Cool Edge Act 1 or the second day section of Eggmanland! Never stay out of that momentum like in Unwiished.
 
-You add `CodeX="DisableMusicRestartOnDeath"` like you'd do with `DisableMusicRestartOnDeath`.
+You update ModsDB.ini` in the `mods` folder and CodeX="AllowBobsleighBoost"` under the `[Codes]`
 
 > [!NOTE]
 > 
-> To preserve speedrunning publications, a watermark is added when boosing on the bobsleigh is used. It shows the coefficient used compared to using the bobsleigh normally.
+> To preserve the seedrunning publication, using this feature will add a temporary watermark when Sonic is boosting inside the bobsleigh. It **won't** show while Sonic is on foot.
+> 
+> The watermark will show the coefficient compared to bobsleighing without boosting.
+
+***The option is extreamly buggy.***
 
 ## Minimum System Requirements
 
@@ -95,9 +99,9 @@ You add `CodeX="DisableMusicRestartOnDeath"` like you'd do with `DisableMusicRes
 
 # Update Roadmap
 
-## Enermy Kill Counter on all Stages
+## Enemy Kill Count on All Action Stages
 
-Using the existing hot dog stage system, see how many enemies you killed on any action stage.
+Using the hot dog missions objectives see how enemies you killed in the stage. If you have `SaveScoreAtCheckpoints` turned on it will have the counter reflect that option.
 
 ## More Colors on Controller LED
 
