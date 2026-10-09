@@ -1387,8 +1387,8 @@ static void CreateImGuiBackend()
     InitImGuiUtils();
     AchievementMenu::Init();
     AchievementOverlay::Init();
-    BobsleighBoostOverlay::Init();
     GameplayStatusHud::Init();
+    BobsleighBoostOverlay::Init();
     ButtonGuide::Init();
     MessageWindow::Init();
     OptionsMenu::Init();
@@ -2604,11 +2604,11 @@ static void DrawImGui()
     ImGui::End();
 #endif
 
-    BobsleighBoostOverlay::Draw();
     AchievementMenu::Draw();
     OptionsMenu::Draw();
     AchievementOverlay::Draw();
     GameplayStatusHud::Draw();
+    BobsleighBoostOverlay::Draw();
     InstallerWizard::Draw();
     MessageWindow::Draw();
     ButtonGuide::Draw();

@@ -1438,7 +1438,6 @@ static void DrawConfigOptions()
             DrawConfigOption(rowCount++, yOffset, &Config::MotionBlur, true);
             DrawConfigOption(rowCount++, yOffset, &Config::XboxColorCorrection, true);
             DrawConfigOption(rowCount++, yOffset, &Config::CutsceneAspectRatio, true);
-            DrawConfigOption(rowCount++, yOffset, &Config::UIAlignmentMode, true);
 
             break;
         }
