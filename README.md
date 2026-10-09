@@ -47,7 +47,7 @@ If that doesn't work you can change `ModsDB.ini` in the `mods` folder (on the [U
 > 
 > If for example you added `Code4="DisableMusicRestartOnDeath"` you change `CodeCount=4` to `CodeCount=5`.
 
-## Bobsleigh Boosting
+### Bobsleigh Boosting
 
 Keep on boosting while on the bobsleigh in stages like Cool Edge Act 1 or the second day section of Eggmanland! Never stay out of that momentum like in Unwiished.
 
@@ -55,11 +55,29 @@ You update ModsDB.ini` in the `mods` folder and CodeX="AllowBobsleighBoost"` und
 
 > [!NOTE]
 > 
-> To preserve the seedrunning publication, using this feature will add a temporary watermark when Sonic is boosting inside the bobsleigh. It **won't** show while Sonic is on foot.
+> To preserve the speedrunning publication, using this feature will add a temporary watermark when Sonic is boosting inside the bobsleigh. It **won't** show while Sonic is on foot.
 > 
 > The watermark will show the coefficient compared to bobsleighing without boosting.
 
-***The option is extreamly buggy.***
+***The option is extremely buggy.***
+
+### Extra Ribbons in HUD
+
+Compatible with many HUD mods, show extra data of your gameplay matching the SCORE & TIME ribbons. It works in the Werehog & Hot Dot missions.
+
+Most of these settings are in the new HUD tab in options.
+
+#### Enemy Counter on All Levels
+
+Shows how many enemies you destroyed in any levels so you can see how your carnage is going. If you have `SaveScoreAtCheckpoints` turned from HedgeModManager the counter will accept this rule.
+
+#### FPS in a Ribbon
+
+It was used initially for testing the ribbons itself but it looked nice so it stays. You can set if you want the FPS counter as a standard banner as before or move to the new ribbon system. If set to `Ribbon` it will supress the banner if you're playig a stage
+
+#### Sonic Position
+
+Useful for debugging a stage mod, show Sonic's **x, y, z** coordinate in the ribbon.
 
 ## Minimum System Requirements
 
@@ -112,6 +130,12 @@ If you have a DualShock 4 or DualSense controller, more colors are coming. Green
 ## Chip's Control Overlay
 
 When Right Trigger Action is set to Boost, the placement displayed may look out of place.
+
+## Sonic Hates the Bobsleigh when Boosting
+
+If you boost at least in the bobsleigh, there is a chance he'll hop off for touching the dash pannel or hitting a hazard. If this happens while occurring a hazard the damage will apply twice making him immediately (effectly killing him if he has low enough of a non-zero amount of rings). It is very funny.
+
+Also any damage dealt against the bobsleigh while glitched back to on-foot still apply to him even if the bobsleigh is far away (including it falling down/out of bounds).
 
 # FAQ
 
@@ -195,3 +219,7 @@ The copy command *above* is unnecessary if Enhanced UnRecomp can see your saves 
 ## Unleashed Recompiled
 
 This project won't be possible without hedge-dev! Please look at their [official Github page](https://github.com/hedge-dev/UnleashedRecomp#credits) for the thanks they'd want to give to their own individuals and team.
+
+## Features for this Fork
+
+[Labreezy](https://github.com/Labreezy/UnleashedRecomp-Speedrun/tree/practice-tools) - Getting and displaying [Sonic's position](#sonic-position).
