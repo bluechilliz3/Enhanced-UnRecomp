@@ -390,6 +390,12 @@ CONFIG_DEFINE_ENUM_TEMPLATE(EUIAlignmentMode)
     { "Center",  EUIAlignmentMode::Centre }
 };
 
+CONFIG_DEFINE_ENUM_TEMPLATE(EFPSCounterStyle)
+{
+    { "Ribbon", EFPSCounterStyle::Ribbon },
+    { "Banner", EFPSCounterStyle::Banner }
+};
+
 #undef  CONFIG_DEFINE
 #define CONFIG_DEFINE(section, type, name, defaultValue) \
     ConfigDef<type> Config::name{section, #name, defaultValue};

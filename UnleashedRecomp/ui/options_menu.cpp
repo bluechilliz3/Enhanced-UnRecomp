@@ -59,10 +59,19 @@ static constexpr float PADDING_NARROW_GRID_COUNT = 1.0f;
 
 static constexpr float INFO_TEXT_MARQUEE_DELAY = 1.2f;
 
-static constexpr int32_t g_categoryCount = 4;
+// Tab titles are squashed horizontally so they all fit, but never narrower than this.
+// When they still don't fit, the tab strip scrolls instead.
+static constexpr float CATEGORY_MIN_SQUASH_RATIO = 0.8f;
+static constexpr float CATEGORY_SCROLL_SPACING_GRID_COUNT = 4.0f;
+static constexpr float CATEGORY_SCROLL_LOOKAHEAD_GRID_COUNT = 6.0f;
+static constexpr float CATEGORY_SCROLL_FADE_GRID_COUNT = 4.0f;
+static constexpr float CATEGORY_SCROLL_ARROW_GRID_COUNT = 2.0f;
+
+static constexpr int32_t g_categoryCount = 5;
 static int32_t g_categoryIndex;
 static ImVec2 g_categoryAnimMin;
 static ImVec2 g_categoryAnimMax;
+static float g_categoryScrollOffset;
 
 static int32_t g_firstVisibleRowIndex;
 static int32_t g_prevSelectedRowIndex;
@@ -423,6 +432,7 @@ static std::string& GetCategory(int index)
         case 1: return Localise("Options_Category_Input");
         case 2: return Localise("Options_Category_Audio");
         case 3: return Localise("Options_Category_Video");
+        case 4: return Localise("Options_Category_HUD");
     }
 
     return g_localeMissing;
@@ -490,35 +500,102 @@ static bool DrawCategories()
         textWidthSum += textSizes[i].x;
     }
 
+    // Squash the titles to fit, down to CATEGORY_MIN_SQUASH_RATIO. Past that, scroll the strip instead.
     float textSquashRatio = 1.0f;
     float maxTextWidthSum = clipRectWidth - (gridSize * 4.0f * (g_categoryCount - 1));
+    bool isScrolling = false;
     if (textWidthSum > maxTextWidthSum)
     {
         textSquashRatio = maxTextWidthSum / textWidthSum;
+        if (textSquashRatio < CATEGORY_MIN_SQUASH_RATIO)
+        {
+            textSquashRatio = CATEGORY_MIN_SQUASH_RATIO;
+            isScrolling = true;
+        }
+
         for (auto& textSize : textSizes)
             textSize.x *= textSquashRatio;
 
-        textWidthSum = maxTextWidthSum;
+        textWidthSum *= textSquashRatio;
     }
 
     float tabHeight = gridSize * 4.0f;
+
+    // The tabs are laid out along a strip, which a scrolling strip insets to leave room for its arrows.
+    float stripMinX = clipRectMin.x;
+    float stripMaxX = clipRectMax.x;
     float textPadding = (clipRectWidth - textWidthSum) / (g_categoryCount + 1.0f);
-    float xOffset = textPadding;
+
+    if (isScrolling)
+    {
+        stripMinX += gridSize * CATEGORY_SCROLL_ARROW_GRID_COUNT;
+        stripMaxX -= gridSize * CATEGORY_SCROLL_ARROW_GRID_COUNT;
+        textPadding = gridSize * CATEGORY_SCROLL_SPACING_GRID_COUNT;
+    }
+
+    float tabPadding = std::min(textPadding / 2.0f, gridSize * 3.0f);
+
+    // Title positions along the strip, before scrolling. A scrolling strip only leaves room for the selection box at its ends.
+    float textOffsets[g_categoryCount];
+    float contentWidth = isScrolling ? tabPadding : textPadding;
+
+    for (size_t i = 0; i < g_categoryCount; i++)
+    {
+        textOffsets[i] = contentWidth;
+        contentWidth += textSizes[i].x + textPadding;
+    }
+
+    contentWidth += tabPadding - textPadding;
+
+    float stripWidth = stripMaxX - stripMinX;
+    float maxScrollOffset = std::max(0.0f, contentWidth - stripWidth);
+
+    // Animation interrupted by entering/exiting or resizing the options menu
+    bool isLayoutReset = motion < 1.0 || abs(g_categoryAnimMin.y - clipRectMin.y) > 0.01f || abs(g_categoryAnimMax.y - (clipRectMin.y + tabHeight)) > 0.01f;
+
+    if (isScrolling)
+    {
+        // Scroll only as far as needed to keep the selected tab, and some of its neighbours, in view.
+        float lookahead = gridSize * CATEGORY_SCROLL_LOOKAHEAD_GRID_COUNT;
+        float selectedMin = textOffsets[g_categoryIndex] - tabPadding - lookahead;
+        float selectedMax = textOffsets[g_categoryIndex] + textSizes[g_categoryIndex].x + tabPadding + lookahead;
+
+        float scrollTarget = std::min(g_categoryScrollOffset, selectedMin);
+        scrollTarget = std::max(scrollTarget, selectedMax - stripWidth);
+        scrollTarget = std::clamp(scrollTarget, 0.0f, maxScrollOffset);
+
+        if (isLayoutReset)
+        {
+            g_categoryScrollOffset = scrollTarget;
+        }
+        else
+        {
+            float prevScrollOffset = g_categoryScrollOffset;
+            g_categoryScrollOffset = Lerp(g_categoryScrollOffset, scrollTarget, 1.0f - exp(-16.0f * ImGui::GetIO().DeltaTime));
+
+            // Carry the selection box along with the strip.
+            g_categoryAnimMin.x -= g_categoryScrollOffset - prevScrollOffset;
+            g_categoryAnimMax.x -= g_categoryScrollOffset - prevScrollOffset;
+        }
+    }
+    else
+    {
+        g_categoryScrollOffset = 0.0f;
+    }
+
+    float xOffset = stripMinX - clipRectMin.x - g_categoryScrollOffset;
     xOffset -= (1.0 - motion) * gridSize * 4.0;
 
     ImVec2 textPositions[g_categoryCount];
 
     for (size_t i = 0; i < g_categoryCount; i++)
     {
-        float tabPadding = std::min(textPadding / 2.0f, gridSize * 3.0f);
-
-        ImVec2 min = { clipRectMin.x + xOffset - tabPadding, clipRectMin.y };
+        ImVec2 min = { clipRectMin.x + xOffset + textOffsets[i] - tabPadding, clipRectMin.y };
         ImVec2 max = { min.x + textSizes[i].x + tabPadding * 2.0f, min.y + tabHeight};
 
         if (g_categoryIndex == i)
         {
-            // Animation interrupted by entering/exiting or resizing the options menu
-            if (motion < 1.0 || abs(g_categoryAnimMin.y - min.y) > 0.01f || abs(g_categoryAnimMax.y - max.y) > 0.01f)
+            if (isLayoutReset)
             {
                 g_categoryAnimMin = min;
                 g_categoryAnimMax = max;
@@ -528,7 +605,7 @@ static bool DrawCategories()
                 float animWidth = g_categoryAnimMax.x - g_categoryAnimMin.x;
                 float width = max.x - min.x;
                 float height = max.y - min.y;
-                
+
                 animWidth = Lerp(animWidth, width, 1.0f - exp(-64.0f * ImGui::GetIO().DeltaTime));
 
                 auto center = Lerp(min, max, 0.5f);
@@ -542,6 +619,8 @@ static bool DrawCategories()
                 g_categoryAnimMax = { animatedCenter.x + widthHalfExtent, animatedCenter.y + heightHalfExtent };
             }
 
+            // Keep the selection box off the arrows while the strip scrolls.
+            drawList->PushClipRect({ stripMinX, clipRectMin.y }, { stripMaxX, clipRectMax.y }, true);
             SetShaderModifier(IMGUI_SHADER_MODIFIER_SCANLINE_BUTTON);
 
             drawList->AddRectFilledMultiColor
@@ -549,14 +628,14 @@ static bool DrawCategories()
                 g_categoryAnimMin,
                 g_categoryAnimMax,
                 IM_COL32(0, 130, 0, 223 * motion),
-                IM_COL32(0, 130, 0, 178 * motion), 
+                IM_COL32(0, 130, 0, 178 * motion),
                 IM_COL32(0, 130, 0, 223 * motion),
                 IM_COL32(0, 130, 0, 178 * motion)
             );
 
             drawList->AddRectFilledMultiColor
             (
-                g_categoryAnimMin, 
+                g_categoryAnimMin,
                 g_categoryAnimMax,
                 IM_COL32(0, 0, 0, 13 * motion),
                 IM_COL32(0, 0, 0, 0),
@@ -566,37 +645,79 @@ static bool DrawCategories()
 
             drawList->AddRectFilledMultiColor
             (
-                g_categoryAnimMin, 
+                g_categoryAnimMin,
                 g_categoryAnimMax,
                 IM_COL32(0, 130, 0, 13 * motion),
                 IM_COL32(0, 130, 0, 111 * motion),
-                IM_COL32(0, 130, 0, 0), 
+                IM_COL32(0, 130, 0, 0),
                 IM_COL32(0, 130, 0, 55 * motion)
             );
 
             SetShaderModifier(IMGUI_SHADER_MODIFIER_NONE);
+            drawList->PopClipRect();
         }
 
         // Store to draw again later, otherwise the tab background gets drawn on top of text during the animation.
-        textPositions[i] = { clipRectMin.x + xOffset, clipRectMin.y };
-        xOffset += textSizes[i].x + textPadding;
+        textPositions[i] = { clipRectMin.x + xOffset + textOffsets[i], clipRectMin.y };
     }
 
+    // Fade-out widths at each end of a scrolling strip, only where there are more tabs past that end.
+    float fadeWidth = gridSize * CATEGORY_SCROLL_FADE_GRID_COUNT;
+    float leftFadeWidth = isScrolling ? std::min(g_categoryScrollOffset, fadeWidth) : 0.0f;
+    float rightFadeWidth = isScrolling ? std::min(maxScrollOffset - g_categoryScrollOffset, fadeWidth) : 0.0f;
+
+    /* Text isn't clipped on the right: ImGui culls glyphs by their unsquashed positions, which
+       would drop letters that are still on screen once squashed. Past a scrolled edge, the
+       fade gradient below hides the text instead. */
+    drawList->PushClipRect(clipRectMin, { ImGui::GetIO().DisplaySize.x, clipRectMax.y });
     SetScale({ textSquashRatio, 1.0f });
 
     for (size_t i = 0; i < g_categoryCount; i++)
     {
         auto& pos = textPositions[i];
+        float textMaxX = pos.x + textSizes[i].x;
+
+        if (isScrolling && (textMaxX < stripMinX || pos.x > stripMaxX))
+            continue;
+
         uint8_t alpha = (i == g_categoryIndex ? 235 : 128) * motion;
-        
+
         SetOrigin({ pos.x, pos.y });
-        SetGradient
-        (
-            pos,
-            { pos.x + textSizes[i].x, pos.y + textSizes[i].y },
-            IM_COL32(128, 255, 0, alpha),
-            IM_COL32(255, 192, 0, alpha)
-        );
+
+        auto topColor = IM_COL32(128, 255, 0, alpha);
+        auto bottomColor = IM_COL32(255, 192, 0, alpha);
+        auto topClearColor = IM_COL32(128, 255, 0, 0);
+        auto bottomClearColor = IM_COL32(255, 192, 0, 0);
+
+        // The gradient clamps past its bounds, so fading over the edge also hides anything past it.
+        if (leftFadeWidth > 1.0f && pos.x < stripMinX + leftFadeWidth)
+        {
+            SetGradient
+            (
+                { stripMinX, pos.y },
+                { stripMinX + leftFadeWidth, pos.y + textSizes[i].y },
+                topClearColor, topColor, bottomColor, bottomClearColor
+            );
+        }
+        else if (rightFadeWidth > 1.0f && textMaxX > stripMaxX - rightFadeWidth)
+        {
+            SetGradient
+            (
+                { stripMaxX - rightFadeWidth, pos.y },
+                { stripMaxX, pos.y + textSizes[i].y },
+                topColor, topClearColor, bottomClearColor, bottomColor
+            );
+        }
+        else
+        {
+            SetGradient
+            (
+                pos,
+                { textMaxX, pos.y + textSizes[i].y },
+                topColor,
+                bottomColor
+            );
+        }
 
         DrawTextWithOutline
         (
@@ -613,6 +734,41 @@ static bool DrawCategories()
 
     SetScale({ 1.0f, 1.0f });
     SetOrigin({ 0.0f, 0.0f });
+    drawList->PopClipRect();
+
+    // Arrows at the ends of a scrolling strip with more tabs past them.
+    if (isScrolling)
+    {
+        float arrowWidth = gridSize;
+        float arrowHalfHeight = gridSize;
+        float arrowCenterY = clipRectMin.y + tabHeight / 2.0f;
+
+        auto drawArrow = [&](float gutterMinX, float gutterMaxX, bool pointsLeft, float hiddenWidth)
+        {
+            uint8_t alpha = 235 * motion * std::clamp(hiddenWidth / fadeWidth, 0.0f, 1.0f);
+
+            if (alpha == 0)
+                return;
+
+            float centerX = (gutterMinX + gutterMaxX) / 2.0f;
+            float tipX = pointsLeft ? centerX - arrowWidth / 2.0f : centerX + arrowWidth / 2.0f;
+            float baseX = pointsLeft ? centerX + arrowWidth / 2.0f : centerX - arrowWidth / 2.0f;
+
+            ImVec2 min = { centerX - arrowWidth / 2.0f, arrowCenterY - arrowHalfHeight };
+            ImVec2 max = { centerX + arrowWidth / 2.0f, arrowCenterY + arrowHalfHeight };
+
+            // Clockwise either way round, for the anti-aliased fill.
+            ImVec2 baseFirst = { baseX, pointsLeft ? min.y : max.y };
+            ImVec2 baseSecond = { baseX, pointsLeft ? max.y : min.y };
+
+            SetGradient(min, max, IM_COL32(128, 255, 0, alpha), IM_COL32(255, 192, 0, alpha));
+            drawList->AddTriangleFilled(baseFirst, baseSecond, { tipX, arrowCenterY }, IM_COL32_WHITE);
+        };
+
+        drawArrow(clipRectMin.x, stripMinX, true, g_categoryScrollOffset);
+        drawArrow(stripMaxX, clipRectMax.x, false, maxScrollOffset - g_categoryScrollOffset);
+    }
+
     ResetGradient();
 
     if (g_isStage || (ImGui::GetTime() - g_appearTime) >= (CONTAINER_FULL_DURATION / 60.0))
@@ -1286,6 +1442,13 @@ static void DrawConfigOptions()
 
             break;
         }
+        case 4: // HUD
+        {
+            DrawConfigOption(rowCount++, yOffset, &Config::UIAlignmentMode, true); // in config file it is still VIDEO for backwards compatibility.
+            DrawConfigOption(rowCount++, yOffset, &Config::EnemyCounter, true);
+            DrawConfigOption(rowCount++, yOffset, &Config::FPSCounterStyleInStages, Config::ShowFPS, &Localise("Options_Desc_FPSCounterOff"));
+            break;
+        }
     }
 
     auto inputState = SWA::CInputState::GetInstance();
@@ -1804,6 +1967,7 @@ void OptionsMenu::Open(bool isPause, SWA::EMenuType pauseMenuType)
     g_categoryIndex = 0;
     g_categoryAnimMin = { 0.0f, 0.0f };
     g_categoryAnimMax = { 0.0f, 0.0f };
+    g_categoryScrollOffset = 0.0f;
     g_selectedItem = nullptr;
     g_titleAnimBegin = true;
     g_currentChannelConfig = Config::ChannelConfiguration;

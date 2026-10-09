@@ -76,6 +76,11 @@ CONFIG_DEFINE_LOCALISED("Video", bool, XboxColorCorrection, false);
 CONFIG_DEFINE_ENUM_LOCALISED("Video", ECutsceneAspectRatio, CutsceneAspectRatio, ECutsceneAspectRatio::Original);
 CONFIG_DEFINE_ENUM_LOCALISED("Video", EUIAlignmentMode, UIAlignmentMode, EUIAlignmentMode::Edge);
 
+// The options menu's HUD tab also shows Video/UIAlignmentMode, which keep
+// their sections so existing config files (and upstream's) still read them.
+CONFIG_DEFINE_ENUM_LOCALISED("HUD", EFPSCounterStyle, FPSCounterStyleInStages, EFPSCounterStyle::Ribbon);
+CONFIG_DEFINE_LOCALISED("HUD", bool, EnemyCounter, false);
+
 CONFIG_DEFINE_HIDDEN("Codes", bool, AllowBobsleighBoost, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, AllowCancellingUnleash, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, DisableAutoSaveWarning, false);

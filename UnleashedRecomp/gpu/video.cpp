@@ -20,6 +20,7 @@
 #include <ui/achievement_menu.h>
 #include <ui/achievement_overlay.h>
 #include <ui/bobsleigh_boost_overlay.h>
+#include <ui/gameplay_status_hud_ribbon.h>
 #include <ui/button_guide.h>
 #include <ui/fader.h>
 #include <ui/imgui_utils.h>
@@ -817,6 +818,7 @@ enum class RenderCommandType
     UnlockBuffer16,
     UnlockBuffer32,
     DrawImGui,
+    DrawImGuiInGameFrame,
     ExecuteCommandList,
     BeginCommandList,
     StretchRect,
@@ -1001,6 +1003,11 @@ struct RenderCommand
         {
             GuestShader* shader;
         } setPixelShader;
+
+        struct
+        {
+            ImGuiInFrameDrawList* drawList; // owned; handed back to the guest thread once drawn
+        } drawImGuiInGameFrame;
     };
 };
 
@@ -1381,6 +1388,7 @@ static void CreateImGuiBackend()
     AchievementMenu::Init();
     AchievementOverlay::Init();
     BobsleighBoostOverlay::Init();
+    GameplayStatusHud::Init();
     ButtonGuide::Init();
     MessageWindow::Init();
     OptionsMenu::Init();
@@ -2506,6 +2514,9 @@ static void DrawFPS()
     if (!Config::ShowFPS)
         return;
 
+    if (Config::FPSCounterStyleInStages == EFPSCounterStyle::Ribbon && GameplayStatusHudRibbon::RibbonCanShow())
+        return;
+
     double time = ImGui::GetTime();
     static double updateTime = time;
     static double fps = 0;
@@ -2597,6 +2608,7 @@ static void DrawImGui()
     AchievementMenu::Draw();
     OptionsMenu::Draw();
     AchievementOverlay::Draw();
+    GameplayStatusHud::Draw();
     InstallerWizard::Draw();
     MessageWindow::Draw();
     ButtonGuide::Draw();
@@ -2619,14 +2631,13 @@ static void DrawImGui()
 }
 
 static void SetFramebuffer(GuestSurface *renderTarget, GuestSurface *depthStencil, bool settingForClear);
+static bool PopulateBarriersForStretchRect(GuestSurface* renderTarget, GuestSurface* depthStencil);
+static void ExecutePendingStretchRectCommands(GuestSurface* renderTarget, GuestSurface* depthStencil);
 
-static void ProcDrawImGui(const RenderCommand& cmd)
+// Draws ImGui draw lists, laid out over [displayPos, displayPos + displaySize], into the bound
+// framebuffer (colour only, in the backbuffer's format).
+static void DrawImGuiLists(ImDrawList* const* drawLists, int drawListCount, ImVec2 displayPos, ImVec2 displaySize)
 {
-    // Make sure the backbuffer is the current target.
-    AddBarrier(g_backBuffer, RenderTextureLayout::COLOR_WRITE);
-    FlushBarriers();
-    SetFramebuffer(g_backBuffer, nullptr, false);
-
     auto& commandList = g_commandLists[g_frame];
     auto pipeline = g_imPipeline.get();
 
@@ -2635,12 +2646,11 @@ static void ProcDrawImGui(const RenderCommand& cmd)
     commandList->setGraphicsDescriptorSet(g_textureDescriptorSet.get(), 0);
     commandList->setGraphicsDescriptorSet(g_samplerDescriptorSet.get(), 1);
 
-    auto& drawData = *ImGui::GetDrawData();
-    commandList->setViewports(RenderViewport(drawData.DisplayPos.x, drawData.DisplayPos.y, drawData.DisplaySize.x, drawData.DisplaySize.y));
+    commandList->setViewports(RenderViewport(displayPos.x, displayPos.y, displaySize.x, displaySize.y));
 
     ImGuiPushConstants pushConstants{};
-    pushConstants.displaySize = drawData.DisplaySize;
-    pushConstants.inverseDisplaySize = { 1.0f / drawData.DisplaySize.x, 1.0f / drawData.DisplaySize.y };
+    pushConstants.displaySize = displaySize;
+    pushConstants.inverseDisplaySize = { 1.0f / displaySize.x, 1.0f / displaySize.y };
     commandList->setGraphicsPushConstants(0, &pushConstants);
 
     size_t pushConstantRangeMin = ~0;
@@ -2662,9 +2672,9 @@ static void ProcDrawImGui(const RenderCommand& cmd)
 
     ImRect clipRect{};
 
-    for (int i = 0; i < drawData.CmdListsCount; i++)
+    for (int i = 0; i < drawListCount; i++)
     {
-        auto& drawList = drawData.CmdLists[i];
+        auto drawList = drawLists[i];
 
         auto vertexBufferAllocation = g_uploadAllocators[g_frame].allocate<false>(drawList->VtxBuffer.Data, drawList->VtxBuffer.Size * sizeof(ImDrawVert), alignof(ImDrawVert));
         auto indexBufferAllocation = g_uploadAllocators[g_frame].allocate<false>(drawList->IdxBuffer.Data, drawList->IdxBuffer.Size * sizeof(uint16_t), alignof(uint16_t));
@@ -2763,6 +2773,97 @@ static void ProcDrawImGui(const RenderCommand& cmd)
             }
         }
     }
+}
+
+static void ProcDrawImGui(const RenderCommand& cmd)
+{
+    // Make sure the backbuffer is the current target.
+    AddBarrier(g_backBuffer, RenderTextureLayout::COLOR_WRITE);
+    FlushBarriers();
+    SetFramebuffer(g_backBuffer, nullptr, false);
+
+    auto& drawData = *ImGui::GetDrawData();
+    DrawImGuiLists(drawData.CmdLists.Data, drawData.CmdListsCount, drawData.DisplayPos, drawData.DisplaySize);
+}
+
+// In-frame draw lists the render thread is done with, freed back on the guest thread: their
+// buffers come from ImGui's allocator, which keeps a (non-atomic) count in the ImGui context
+// that the guest thread uses.
+static std::mutex g_drawnInFrameListsMutex;
+static std::vector<ImGuiInFrameDrawList*> g_drawnInFrameLists;
+
+void Video::DrawInGameFrame(std::unique_ptr<ImGuiInFrameDrawList> drawList)
+{
+    {
+        std::lock_guard lock(g_drawnInFrameListsMutex);
+        for (auto drawnList : g_drawnInFrameLists)
+            delete drawnList;
+
+        g_drawnInFrameLists.clear();
+    }
+
+    drawList->drawList._PopUnusedDrawCmd();
+    if (drawList->drawList.CmdBuffer.empty())
+        return;
+
+    // Queued right behind the game's own draw calls so far, and drawn in that order.
+    RenderCommand cmd;
+    cmd.type = RenderCommandType::DrawImGuiInGameFrame;
+    cmd.drawImGuiInGameFrame.drawList = drawList.release();
+    g_renderQueue.enqueue(cmd);
+}
+
+static void ProcDrawImGuiInGameFrame(const RenderCommand& cmd)
+{
+    auto drawList = cmd.drawImGuiInGameFrame.drawList;
+
+    // Commands are recorded here; the list's memory can go back to the guest thread whenever.
+    auto release = [&]()
+    {
+        std::lock_guard lock(g_drawnInFrameListsMutex);
+        g_drawnInFrameLists.push_back(drawList);
+    };
+
+    // Draw into whatever the game is drawing to at this point (its HUD goes to the backbuffer), as
+    // long as the ImGui pipeline can: the backbuffer's format, single-sampled, and the overlay's
+    // size, since the list is laid out in the overlay's coordinates. Anything else skips it.
+    auto renderTarget = g_renderTarget;
+    if (renderTarget == nullptr || renderTarget->format != BACKBUFFER_FORMAT ||
+        renderTarget->sampleCount != RenderSampleCount::COUNT_1 ||
+        renderTarget->width != g_backBuffer->width || renderTarget->height != g_backBuffer->height)
+    {
+        release();
+        return;
+    }
+
+    // Copies still pending from the target were queued to capture it as it is now; run them first.
+    if (PopulateBarriersForStretchRect(renderTarget, nullptr))
+    {
+        FlushBarriers();
+        ExecutePendingStretchRectCommands(renderTarget, nullptr);
+    }
+
+    AddBarrier(renderTarget, RenderTextureLayout::COLOR_WRITE);
+    FlushBarriers();
+
+    // The ImGui pipeline has no depth attachment, so bind the target on its own.
+    g_dirtyStates.renderTargetAndDepthStencil = true;
+    SetFramebuffer(renderTarget, nullptr, false);
+
+    ImDrawList* drawLists[] = { &drawList->drawList };
+    DrawImGuiLists(drawLists, 1, { 0.0f, 0.0f }, { float(renderTarget->width), float(renderTarget->height) });
+
+    // Hand the command list back to the game's draws: its pipeline layout and descriptor sets (as
+    // BeginCommandList binds them), and every piece of state re-applied on its next draw.
+    auto& commandList = g_commandLists[g_frame];
+    commandList->setGraphicsPipelineLayout(g_pipelineLayout.get());
+    commandList->setGraphicsDescriptorSet(g_textureDescriptorSet.get(), 0);
+    commandList->setGraphicsDescriptorSet(g_textureDescriptorSet.get(), 1);
+    commandList->setGraphicsDescriptorSet(g_textureDescriptorSet.get(), 2);
+    commandList->setGraphicsDescriptorSet(g_samplerDescriptorSet.get(), 3);
+    g_dirtyStates = DirtyStates(true);
+
+    release();
 }
 
 // We have to check for this to properly handle the following situation:
@@ -5296,6 +5397,7 @@ static std::thread g_renderThread([]
                 case RenderCommandType::SetStreamSource:                   ProcSetStreamSource(cmd); break;
                 case RenderCommandType::SetIndices:                        ProcSetIndices(cmd); break;
                 case RenderCommandType::SetPixelShader:                    ProcSetPixelShader(cmd); break;
+                case RenderCommandType::DrawImGuiInGameFrame:              ProcDrawImGuiInGameFrame(cmd); break;
                 default:                                                   assert(false && "Unrecognized render command type."); break;
                 }
             }

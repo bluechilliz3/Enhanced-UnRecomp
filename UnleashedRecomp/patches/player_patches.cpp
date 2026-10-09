@@ -10,6 +10,8 @@ static uint32_t g_lastEnemyScore;
 static uint32_t g_lastTrickScore;
 static float g_lastDarkGaiaEnergy;
 static bool g_isUnleashCancelled;
+static uint32_t g_lastEnemyCount;
+static uint32_t g_lastEnemyCountManager;
 
 // RT's rising edge, recomputed once per frame in PlayerPatches::Update.
 static bool g_rtBoostPrev = false;
@@ -21,6 +23,21 @@ static thread_local bool g_inBoostUpdate = false; // sub_8239E3B8  (held  -> sus
 static thread_local bool g_inDiveDecision = false; // sub_82391898 / sub_82391408 (held -> dive)
 static thread_local bool g_inSuperBoostEntry = false;  // sub_82451F10 (Super Sonic tapped -> start)
 static thread_local bool g_inSuperBoostUpdate = false; // sub_82452518 (Super Sonic held -> sustain)
+
+// The game document's member keeps the stage's CMissionManager as a shared_ptr at +0x1C8 (its
+// first word is the pointee). The manager counts the enemies defeated at +0xFC.
+static constexpr uint32_t DOCUMENT_MISSION_MANAGER = 0x1C8;
+static constexpr uint32_t MISSION_ENEMY_COUNT      = 0xFC;
+
+static uint32_t GetMissionManager(SWA::CGameDocument* pGameDocument)
+{
+    const auto pMember = reinterpret_cast<const uint8_t*>(pGameDocument->m_pMember.get());
+    if (pMember == nullptr)
+        return 0;
+
+    const uint32_t missionManager = *reinterpret_cast<const be<uint32_t>*>(pMember + DOCUMENT_MISSION_MANAGER);
+    return missionManager >= 0x10000u ? missionManager : 0;
+}
 
 /* Hook function for when checkpoints are activated
    to preserve the current checkpoint score. */
@@ -37,7 +54,14 @@ PPC_FUNC(sub_82624308)
         g_lastEnemyScore = pGameDocument->m_pMember->m_ScoreInfo.EnemyScore;
         g_lastTrickScore = pGameDocument->m_pMember->m_ScoreInfo.TrickScore;
 
-        LOGFN("Score: {}", g_lastEnemyScore + g_lastTrickScore);
+        // The enemy count (the Enemy Counter option's row) is kept the same way.
+        if (const uint32_t missionManager = GetMissionManager(pGameDocument))
+        {
+            g_lastEnemyCount = PPC_LOAD_U32(missionManager + MISSION_ENEMY_COUNT);
+            g_lastEnemyCountManager = missionManager;
+        }
+
+        LOGFN("Score: {}, Enemies: {}", g_lastEnemyScore + g_lastTrickScore, g_lastEnemyCount);
     }
 }
 
@@ -64,6 +88,24 @@ void ResetScoreOnRestartMidAsmHook()
 {
     g_lastEnemyScore = 0;
     g_lastTrickScore = 0;
+    g_lastEnemyCount = 0;
+}
+
+/* Hook function for the mission manager's MsgRestartStage
+   handler, which zeroes its counters (the enemy count among
+   them) on every respawn, and restore the last checkpoint's
+   enemy count, like the score. */
+PPC_FUNC_IMPL(__imp__sub_8259B400);
+PPC_FUNC(sub_8259B400)
+{
+    const uint32_t missionManager = ctx.r3.u32;
+
+    auto isRespawn = (PPC_LOAD_U32(ctx.r4.u32 + 24) & 1) != 0;
+
+    __imp__sub_8259B400(ctx, base);
+
+    if (Config::SaveScoreAtCheckpoints && isRespawn && missionManager == g_lastEnemyCountManager)
+        PPC_STORE_U32(missionManager + MISSION_ENEMY_COUNT, g_lastEnemyCount);
 }
 
 // Dark Gaia energy change hook.
@@ -111,8 +153,11 @@ void PostUnleashMidAsmHook(PPCRegister& r30)
 PPC_FUNC_IMPL(__imp__sub_823B49D8);
 PPC_FUNC(sub_823B49D8)
 {
+    const uint32_t pEvilSonicContext = ctx.r3.u32;
+    
     __imp__sub_823B49D8(ctx, base);
 
+    SWA::Player::CEvilSonicContext::s_instance = pEvilSonicContext;
     App::s_isWerehog = true;
 
     SDL_User_EvilSonic(true);
@@ -122,6 +167,9 @@ PPC_FUNC(sub_823B49D8)
 PPC_FUNC_IMPL(__imp__sub_823B4590);
 PPC_FUNC(sub_823B4590)
 {
+    uint32_t pEvilSonicContext = ctx.r3.u32;
+    SWA::Player::CEvilSonicContext::s_instance.compare_exchange_strong(pEvilSonicContext, 0);
+
     __imp__sub_823B4590(ctx, base);
 
     App::s_isWerehog = false;

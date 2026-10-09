@@ -155,6 +155,7 @@ set(UNLEASHED_RECOMP_UI_CXX_SOURCES
     "ui/bobsleigh_boost_overlay.cpp"
     "ui/button_guide.cpp"
     "ui/fader.cpp"
+    "ui/gameplay_status_hud_ribbon.cpp"
     "ui/game_window.cpp"
     "ui/imgui_utils.cpp"
     "ui/installer_wizard.cpp"

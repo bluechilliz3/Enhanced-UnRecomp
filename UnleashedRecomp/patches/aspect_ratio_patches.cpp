@@ -3,6 +3,7 @@
 #include <app.h>
 #include <ui/game_window.h>
 #include <ui/black_bar.h>
+#include <ui/gameplay_status_hud_ribbon.h>
 #include <gpu/video.h>
 #include <xxHashMap.h>
 
@@ -821,12 +822,19 @@ static bool g_cornerExtract;
 static float g_scenePositionX;
 static float g_scenePositionY;
 
+// Whether the CScene being rendered has drawn a quad yet (set by the draw hook), so the render
+// hook can report the scenes the game really drew.
+static bool g_renderingSceneDrawn;
+
 // Chao::CSD::CScene::Render
 PPC_FUNC_IMPL(__imp__sub_830BC640);
 PPC_FUNC(sub_830BC640)
 {
     g_scenePositionX = 0.0f;
     g_scenePositionY = 0.0f;
+
+    const uint32_t scene = ctx.r3.u32;
+    g_renderingSceneDrawn = false;
 
     uint32_t motionPattern = PPC_LOAD_U32(ctx.r3.u32 + 0x98);
     if (motionPattern != NULL)
@@ -843,6 +851,9 @@ PPC_FUNC(sub_830BC640)
     }
 
     __imp__sub_830BC640(ctx, base);
+
+    if (g_renderingSceneDrawn)
+        GameplayStatusHudRibbon::NotifyCsdSceneRendered(scene);
 }
 
 // Chao::CSD::Scene::Render
@@ -952,6 +963,8 @@ static void Draw(PPCContext& ctx, uint8_t* base, PPCFunc* original, uint32_t str
 
         return;
     }
+    
+    g_renderingSceneDrawn = true;
 
     if (Config::UIAlignmentMode == EUIAlignmentMode::Centre)
     {

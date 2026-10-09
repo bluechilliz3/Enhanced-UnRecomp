@@ -156,6 +156,12 @@ enum class EUIAlignmentMode : uint32_t
     Centre
 };
 
+enum class EFPSCounterStyle : uint32_t
+{
+    Ribbon,
+    Banner
+};
+
 template<typename T, bool isHidden = false>
 class ConfigDef final : public IConfigDef
 {

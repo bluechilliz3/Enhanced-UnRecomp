@@ -13,6 +13,8 @@
 
 using namespace plume;
 
+struct ImGuiInFrameDrawList;
+
 struct Video
 {
     static inline uint32_t s_viewportWidth;
@@ -21,6 +23,7 @@ struct Video
     static bool CreateHostDevice(const char *sdlVideoDriver, bool graphicsApiRetry);
     static void WaitOnSwapChain();
     static void Present();
+    static void DrawInGameFrame(std::unique_ptr<ImGuiInFrameDrawList> drawList);
     static void StartPipelinePrecompilation();
     static void WaitForGPU();
     static void ComputeViewportDimensions();

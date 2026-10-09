@@ -105,6 +105,17 @@ std::unordered_map<std::string_view, std::unordered_map<ELanguage, std::string>>
         }
     },
     {
+        "Options_Category_HUD",
+        {
+            { ELanguage::English,  "HUD" },
+            { ELanguage::Japanese, "HUD" },
+            { ELanguage::German,   "HUD" },
+            { ELanguage::French,   "HUD" }, // Translation required?
+            { ELanguage::Spanish,  "HUD" },
+            { ELanguage::Italian,  "HUD" }
+        }
+    },
+    {
         // Notes: integer values in the options menu (e.g. FPS) when at their maximum value.
         "Options_Value_Max",
         {
@@ -218,6 +229,19 @@ std::unordered_map<std::string_view, std::unordered_map<ELanguage, std::string>>
         }
     },
     {
+        // Notes: description for FPS Counter Style in Stages when the FPS counter is turned off.
+        // Japanese Notes: This localization should include furigana.
+        "Options_Desc_FPSCounterOff",
+        {
+            { ELanguage::English,  "The FPS counter is turned off. You can turn it on with Show FPS in the F1 menu." },
+            { ELanguage::Japanese, "The FPS counter is turned off. You can turn it on with Show FPS in the F1 menu." },
+            { ELanguage::German,   "The FPS counter is turned off. You can turn it on with Show FPS in the F1 menu." },
+            { ELanguage::French,   "The FPS counter is turned off. You can turn it on with Show FPS in the F1 menu." },
+            { ELanguage::Spanish,  "The FPS counter is turned off. You can turn it on with Show FPS in the F1 menu." },
+            { ELanguage::Italian,  "The FPS counter is turned off. You can turn it on with Show FPS in the F1 menu." }
+        }
+    },
+    {
         // Notes: message appears when changing the Language option and backing out of the options menu.
         // Japanese Notes: This localization should include furigana.
         "Options_Message_Restart",
@@ -228,6 +252,44 @@ std::unordered_map<std::string_view, std::unordered_map<ELanguage, std::string>>
             { ELanguage::French,   "Le jeu va maintenant redémarrer." },
             { ELanguage::Spanish,  "El juego se va a reiniciar." },
             { ELanguage::Italian,  "Il gioco verrà riavviato." }
+        }
+    },
+    {
+        // Notes: used for the button guide on the world map, to cycle between countries (LB/RB).
+        "WorldMap_Country",
+        {
+            { ELanguage::English,  "Country" },
+            { ELanguage::Japanese, "エリア" },
+            { ELanguage::German,   "Land" },
+            { ELanguage::French,   "Pays" },
+            { ELanguage::Spanish,  "País" },
+            { ELanguage::Italian,  "Paese" }
+        }
+    },
+    {
+        // Notes: used for the button guide on the world map, to switch between day and night stages.
+        "WorldMap_DayNight",
+        {
+            { ELanguage::English,  "Day/Night" },
+            { ELanguage::Japanese, "昼/夜" },
+            { ELanguage::German,   "Tag/Nacht" },
+            { ELanguage::French,   "Jour/Nuit" },
+            { ELanguage::Spanish,  "Día/Noche" },
+            { ELanguage::Italian,  "Giorno/Notte" }
+        }
+    },
+    {
+        // Notes: used for the label of the Enemy Counter's row on the gameplay HUD. The game's own
+        // word, as on its results screen (mat_result_en_001.dds in each language's archives, the
+        // result rows' label pattern 3); the Japanese results screen uses the English labels.
+        "HUD_EnemyCounter",
+        {
+            { ELanguage::English,  "ENEMY" },
+            { ELanguage::Japanese, "ENEMY" },
+            { ELanguage::German,   "GEGNER" },
+            { ELanguage::French,   "ENNEMIS" },
+            { ELanguage::Spanish,  "ENEMIGOS" },
+            { ELanguage::Italian,  "NEMICI" }
         }
     },
     {
