@@ -40,11 +40,12 @@ bool DisableEvilControlTutorialMidAsmHook(PPCRegister& r4, PPCRegister& r5)
     return r4.u32 == 1 && r5.u32 == 1;
 }
 
-// The day-stage boost navigation sign (sub_8239F4A8) hardcodes cast "btn_1" with img
-// pattern 2 (X button). When boost is remapped to the right trigger, redirect the
-// prompt to the trigger cast so the HUD matches the actual control. The play-screen
-// scene's button casts map as: btn_1 = face buttons (0=A 1=B 2=X 3=Y), btn_2 = bumpers
-// (0=LB 1=RB), btn_3 = triggers (0=LT 1=RT).
+// The day-stage boost navigation sign hardcodes cast "btn_1" with img pattern 2 (X button). 
+// When boost is remapped to the right trigger, redirect the prompt to the trigger cast so 
+// the HUD matches the actual control. The play-screen scene's button casts map as: 
+// - btn_1 = face buttons (0=A 1=B 2=X 3=Y)
+// - btn_2 = bumpers (0=LB 1=RB)
+// - btn_3 = triggers (0=LT 1=RT)
 void BoostPromptCastMidAsmHook(PPCRegister& r5)
 {
     if (Config::RightTriggerAction == ERightTriggerAction::Boost)
@@ -65,8 +66,6 @@ void ChipOverlayCsdPatchMidAsmHook(PPCRegister& r8)
 {
     auto base = (uint8_t*)g_memory.Translate(r8.u32);
 
-    // Identify ui_playscreen_su.yncp first: container size in the FAPC header, then
-    // the footer cast name table. Everything else returns before touching config.
     if (*(be<uint32_t>*)(base + 4) != 0x4970)
         return;
 
@@ -87,19 +86,16 @@ void ChipOverlayCsdPatchMidAsmHook(PPCRegister& r8)
     constexpr float kAttackLX = -0.055f; // btn_lt X relative to btn_rt
     constexpr float kAttackLY = 0.0f;    // btn_lt Y relative to btn_rt
 
-    // The footer's button casts (records at 0x1C30 btn_x, 0x1CA4 btn_lb, 0x1D18
-    // btn_lt, 0x1D8C btn_rt) each show their icon via a sprite-index array
-    // ([0, 0, crop], live entry at +8) into the scene crop table (entry 0 at file
-    // 0x734, 20-byte records): 13 = X, 15 = LB (double width), 16 = RB, 17 = LT,
+    // The footer's button casts each show their icon via a sprite-index array
+    // into the scene crop table: 13 = X, 15 = LB (double width), 16 = RB, 17 = LT,
     // 18 = RT. Redirect the indices instead of rewriting the shared crop table.
     *(be<uint32_t>*)(base + 0x3570 + 8) = 18; // Boost row:  btn_x  X  -> RT
     *(be<uint32_t>*)(base + 0x362C + 8) = 17; // Guard row:  btn_lb LB -> LT
     *(be<uint32_t>*)(base + 0x36E8 + 8) = 15; // Attack row: btn_lt LT -> LB
     *(be<uint32_t>*)(base + 0x37A4 + 8) = 16; //             btn_rt RT -> RB
 
-    // Position each cast via its quad corners (8 floats at +0x14: TL BL TR BR as x,y
-    // pairs, right-edge / vertical-centre anchored) and its info-block translation
-    // (+0x0C x, +0x10 y). btn_lt is a CHILD of btn_rt, so its translation is relative.
+    // Position each cast via its quad corners and its info-block translation.
+    // btn_lt is a CHILD of btn_rt, so its translation is relative.
     auto setQuad = [&](uint32_t rec, const QuadLayout& q)
     {
         *(be<float>*)(base + rec + 0x14) = -q.w;        // TL.x
@@ -125,21 +121,14 @@ void ChipOverlayCsdPatchMidAsmHook(PPCRegister& r8)
     *(be<float>*)(base + 0x3824 + 0x0C) = kAttackR.x;
     *(be<float>*)(base + 0x3824 + 0x10) = kAttackR.y;
 
-    // The rendered shape comes from each cast's baked pixel box (u32 width at +0x58,
-    // height at +0x5C) — the art is fitted into it, which is what stretched the
-    // swapped icons. Give each cast the box of the art it now shows: the guard cast
-    // drops from the 80x40 bumper box to the 40x40 trigger box, the attack casts
-    // grow from 40x40 to 80x40.
+    // The rendered shape comes from each cast's baked pixel box. The art is fitted into it,
+    // which is what stretched the swapped icons.
     *(be<uint32_t>*)(base + 0x1CA4 + 0x58) = 40; // btn_lb: square trigger box
     *(be<uint32_t>*)(base + 0x1D18 + 0x58) = 80; // btn_lt: wide bumper box
     *(be<uint32_t>*)(base + 0x1D8C + 0x58) = 80; // btn_rt: wide bumper box
 }
 
-// Stamp the time whenever a prompt is on screen (this+101 = active, this+102 = done).
-// The input driver keeps the boost trigger remap alive during a QTE only while the
-// trigger is held continuously from before the prompt (so the boost aura persists).
-// The QTE is edge-triggered, so a held trigger registers no press and can't answer it.
-// Releasing the trigger suspends the remap so the real face button can.
+// Stamp the time whenever a prompt is on screen.
 void QTEPromptActiveMidAsmHook(PPCRegister& pThis)
 {
     bool isActive = *(uint8_t*)g_memory.Translate(pThis.u32 + 101) != 0;

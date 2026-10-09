@@ -1072,3 +1072,75 @@ CONFIG_DEFINE_ENUM_LOCALE(EUIAlignmentMode)
         }
     }
 };
+
+// Translation required
+// Japanese Notes: This localization should include furigana.
+CONFIG_DEFINE_LOCALE(FPSCounterStyleInStages)
+{
+    { ELanguage::English,  { "FPS Counter Style in Stages", "Change how the FPS counter appears while the gameplay HUD is on screen." } },
+    { ELanguage::Japanese, { "FPS Counter Style in Stages", "Change how the FPS counter appears while the gameplay HUD is on screen." } },
+    { ELanguage::German,   { "FPS Counter Style in Stages", "Change how the FPS counter appears while the gameplay HUD is on screen." } },
+    { ELanguage::French,   { "FPS Counter Style in Stages", "Change how the FPS counter appears while the gameplay HUD is on screen." } },
+    { ELanguage::Spanish,  { "FPS Counter Style in Stages", "Change how the FPS counter appears while the gameplay HUD is on screen." } },
+    { ELanguage::Italian,  { "FPS Counter Style in Stages", "Change how the FPS counter appears while the gameplay HUD is on screen." } }
+};
+
+// Translation required
+// Japanese Notes: This localization should include furigana in its description.
+CONFIG_DEFINE_ENUM_LOCALE(EFPSCounterStyle)
+{
+    {
+        ELanguage::English,
+        {
+            { EFPSCounterStyle::Ribbon, { "RIBBON", "Ribbon: the FPS counter appears as a row under the gameplay HUD, in the game's own style." } },
+            { EFPSCounterStyle::Banner, { "BANNER", "Banner: the FPS counter stays in the top-left corner of the screen, as it appears outside of stages." } }
+        }
+    },
+    {
+        ELanguage::Japanese,
+        {
+            { EFPSCounterStyle::Ribbon, { "RIBBON", "Ribbon: the FPS counter appears as a row under the gameplay HUD, in the game's own style." } },
+            { EFPSCounterStyle::Banner, { "BANNER", "Banner: the FPS counter stays in the top-left corner of the screen, as it appears outside of stages." } }
+        }
+    },
+    {
+        ELanguage::German,
+        {
+            { EFPSCounterStyle::Ribbon, { "RIBBON", "Ribbon: the FPS counter appears as a row under the gameplay HUD, in the game's own style." } },
+            { EFPSCounterStyle::Banner, { "BANNER", "Banner: the FPS counter stays in the top-left corner of the screen, as it appears outside of stages." } }
+        }
+    },
+    {
+        ELanguage::French,
+        {
+            { EFPSCounterStyle::Ribbon, { "RIBBON", "Ribbon: the FPS counter appears as a row under the gameplay HUD, in the game's own style." } },
+            { EFPSCounterStyle::Banner, { "BANNER", "Banner: the FPS counter stays in the top-left corner of the screen, as it appears outside of stages." } }
+        }
+    },
+    {
+        ELanguage::Spanish,
+        {
+            { EFPSCounterStyle::Ribbon, { "RIBBON", "Ribbon: the FPS counter appears as a row under the gameplay HUD, in the game's own style." } },
+            { EFPSCounterStyle::Banner, { "BANNER", "Banner: the FPS counter stays in the top-left corner of the screen, as it appears outside of stages." } }
+        }
+    },
+    {
+        ELanguage::Italian,
+        {
+            { EFPSCounterStyle::Ribbon, { "RIBBON", "Ribbon: the FPS counter appears as a row under the gameplay HUD, in the game's own style." } },
+            { EFPSCounterStyle::Banner, { "BANNER", "Banner: the FPS counter stays in the top-left corner of the screen, as it appears outside of stages." } }
+        }
+    }
+};
+
+// Translation required
+// Japanese Notes: This localization should include furigana.
+CONFIG_DEFINE_LOCALE(EnemyCounter)
+{
+    { ELanguage::English,  { "Enemy Counter", "Show how many enemies you've defeated in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::Japanese, { "Enemy Counter", "Show how many enemies you've defeated in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::German,   { "Enemy Counter", "Show how many enemies you've defeated in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::French,   { "Enemy Counter", "Show how many enemies you've defeated in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::Spanish,  { "Enemy Counter", "Show how many enemies you've defeated in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::Italian,  { "Enemy Counter", "Show how many enemies you've defeated in a new row under the gameplay HUD, in every stage." } }
+};

@@ -81,4 +81,34 @@ extern ImGuiCallbackData* AddImGuiCallback(ImGuiCallback callback);
 
 extern void ResetImGuiCallbacks();
 
+#include <deque>
+
+// A draw list built outside the ImGui frame, to be drawn into the game's frame at a point in its
+// own draw order (Video::DrawInGameFrame) rather than over the finished frame like the overlay.
+// It owns the data its callbacks point to: the render thread reads that after the ImGui frame
+// has moved on, and the shared callback pool is reused every frame.
+struct ImGuiInFrameDrawList
+{
+    ImDrawList drawList;
+    std::deque<ImGuiCallbackData> callbackData;
+
+    // Laid out in the overlay's coordinates (the viewport's pixels), over displaySize.
+    explicit ImGuiInFrameDrawList(ImVec2 displaySize);
+};
+
+// While alive, AddImGuiCallback (and so every helper built on it: SetOrigin, SetScale, SetOutline,
+// SetShaderModifier...) adds to `target` instead of the frame's background draw list.
+class ImGuiCallbackRedirect
+{
+public:
+    explicit ImGuiCallbackRedirect(ImGuiInFrameDrawList* target);
+    ~ImGuiCallbackRedirect();
+
+    ImGuiCallbackRedirect(const ImGuiCallbackRedirect&) = delete;
+    ImGuiCallbackRedirect& operator=(const ImGuiCallbackRedirect&) = delete;
+
+private:
+    ImGuiInFrameDrawList* m_previous;
+};
+
 #endif
