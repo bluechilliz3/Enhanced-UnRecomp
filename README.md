@@ -4,9 +4,9 @@ Enhanced-UnRecomp is a derivation of Unleashed Recompiled. It contains enhanceme
 
 ---
 
-# If you're NOT Familar with Github
+# If you're NOT Familiar with Github
 
-You're not in the right branch if you want all the enhancments. **This area is for developers wanting the ins and out of *one* specific feature and if there's any bugs this where we do the fixing.**.
+You're not in the right branch if you want all the enhancements. **This area is for developers wanting the ins and out of *one* specific feature and if there's any bugs this where we do the fixing.**
 
 Please [click here](https://github.com/bluechilliz3/Enhanced-UnRecomp/tree/all-enhancements) for the default branch please.
 
@@ -28,19 +28,33 @@ Please [click here](https://github.com/bluechilliz3/Enhanced-UnRecomp/tree/all-e
 
 ### No BGM Restart on Respawn
 
-In the modern games the music longer restarts, so it's in the roadmap! If you played the modern games you'll less like to restart the stage as the grove hasn't moved
+In the modern games the music longer restarts, so it's in the roadmap! If you played the modern games you'll less like to restart the stage as the grove hasn't moved.
+
+> [!NOTE]
+> 
+> Using the restart button in the pause menu will restart the BGM as before. So as clicking retry in the after failing a Hot Dog Mission.
 
 # Known Issues
 
-There are known issue with this feature.
+## Eggmanland
+
+If you die as the other form of Sonic before hitting the checkpoint, respawning to the previous form won't update the BGM. 
+
+For example when finishing the first Werehog section and _hitting the hourglass_ to switch back to Day Sonic, if you miss the spring and fall, you'll respawn back to the start of the Werehog section as the Werehog but it'll still play the Day version of Eggmanland.
+
+> [!NOTE]
+> 
+> This is even with `FixEggmanlandUsingEventGalleryTransition` being turn on or off.
 
 # FAQ
 
 ## How to turn on the feature?
 
-You need to edit `ModsDB.ini` under the mod folder and add `CodeX="DisableMusicRestartOnDeath"` (where X is the highest number).
+You need to edit `ModsDB.ini` under the mod folder and add `CodeX="DisableMusicRestartOnDeath"` (where X is the highest number) and update the `CodeCount`. Now you can download `ExtraCodes.hmm` (from the [releases](https://github.com/bluechilliz3/Enhanced-UnRecomp/releases) tab) to your mod folder and it'll show the option in the HedgeModManager.
 
-More detailed instructions comming up,
+> [!NOTE]
+> 
+> Using the `ExtraCodes.hmm` will show other options that aren't compatible with this feature branch. The game will ignore it.
 
 # Building
 
