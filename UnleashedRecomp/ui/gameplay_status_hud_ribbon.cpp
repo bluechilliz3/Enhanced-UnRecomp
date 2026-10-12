@@ -602,9 +602,9 @@ static NativeClone CreateNativeClone(uint32_t project, HudKind kind, bool sonic)
         SetNativeNodeHidden(FindNativeNodeByEntry(clone.scene, FindCastEntry(clone.scene, "position_L", -1)), true);
 
         // Resolve the small ribbon's own casts by group: "txt" repeats in the silver one.
-        const uint32_t small = FindCastEntry(clone.scene, "position_S", -1);
-        const int group = small != 0 ? static_cast<int>(GuestU32(small + 4)) : 0;
-        clone.placeNode = FindNativeNodeByEntry(clone.scene, small);
+        const uint32_t smallRibbon = FindCastEntry(clone.scene, "position_S", -1);
+        const int group = smallRibbon != 0 ? static_cast<int>(GuestU32(smallRibbon + 4)) : 0;
+        clone.placeNode = FindNativeNodeByEntry(clone.scene, smallRibbon);
 
         SetNativeNodeHidden(FindNativeNodeByEntry(clone.scene, FindCastEntry(clone.scene, "txt", group)), true);
         clone.digitsNode = FindNativeNodeByEntry(clone.scene, FindCastEntry(clone.scene, "score", group));
