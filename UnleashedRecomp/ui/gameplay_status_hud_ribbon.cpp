@@ -1327,12 +1327,18 @@ void GameplayStatusHud::Draw()
     // enabled.
     // Text (commas and signs aren't in the native digit font), so it's also the long-string
     // case for the value text's leading flow.
-    // if (Config::ShowSonicPosition)
+    if (Config::ShowSonicPosition)
     {
         char pos[48];
         float x, y, z;
         if (TryReadSonicPosition(x, y, z))
-            std::snprintf(pos, sizeof(pos), "%04.0f, %04.0f, %04.0f", x, y, z);
+            // The ternary operators is needed to prevent negative vales from eating into the
+            // first digits. 
+            std::snprintf(pos, sizeof(pos),
+                          "%0*.*f, %0*.*f, %0*.*f",
+                          x < 0 ? 5 : 4, 0, x,
+                          y < 0 ? 5 : 4, 0, y,
+                          z < 0 ? 5 : 4, 0, z);
         else
             std::snprintf(pos, sizeof(pos), "--");
 

@@ -80,6 +80,7 @@ CONFIG_DEFINE_ENUM_LOCALISED("Video", EUIAlignmentMode, UIAlignmentMode, EUIAlig
 // their sections so existing config files (and upstream's) still read them.
 CONFIG_DEFINE_ENUM_LOCALISED("HUD", EFPSCounterStyle, FPSCounterStyleInStages, EFPSCounterStyle::Ribbon);
 CONFIG_DEFINE_LOCALISED("HUD", bool, EnemyCounter, false);
+CONFIG_DEFINE_LOCALISED("HUD", bool, ShowSonicPosition, false);
 
 CONFIG_DEFINE_HIDDEN("Codes", bool, AllowCancellingUnleash, false);
 CONFIG_DEFINE_HIDDEN("Codes", bool, DisableAutoSaveWarning, false);
