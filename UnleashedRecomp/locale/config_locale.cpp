@@ -1075,6 +1075,18 @@ CONFIG_DEFINE_ENUM_LOCALE(EUIAlignmentMode)
 
 // Translation required
 // Japanese Notes: This localization should include furigana.
+CONFIG_DEFINE_LOCALE(ShowSonicPosition)
+{
+    { ELanguage::English,  { "Sonic's Position", "Show Sonic's position in the world (X, Y, Z) in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::Japanese, { "Sonic's Position", "Show Sonic's position in the world (X, Y, Z) in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::German,   { "Sonic's Position", "Show Sonic's position in the world (X, Y, Z) in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::French,   { "Sonic's Position", "Show Sonic's position in the world (X, Y, Z) in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::Spanish,  { "Sonic's Position", "Show Sonic's position in the world (X, Y, Z) in a new row under the gameplay HUD, in every stage." } },
+    { ELanguage::Italian,  { "Sonic's Position", "Show Sonic's position in the world (X, Y, Z) in a new row under the gameplay HUD, in every stage." } }
+};
+
+// Translation required
+// Japanese Notes: This localization should include furigana.
 CONFIG_DEFINE_LOCALE(FPSCounterStyleInStages)
 {
     { ELanguage::English,  { "FPS Counter Style in Stages", "Change how the FPS counter appears while the gameplay HUD is on screen." } },

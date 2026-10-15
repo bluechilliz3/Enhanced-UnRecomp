@@ -1443,8 +1443,9 @@ static void DrawConfigOptions()
         }
         case 4: // HUD
         {
-            DrawConfigOption(rowCount++, yOffset, &Config::UIAlignmentMode, true); // in config file it is still VIDEO for backwards compatibility.
+            DrawConfigOption(rowCount++, yOffset, &Config::UIAlignmentMode, true); // in config file, it is still VIDEO for backwards compatibility.
             DrawConfigOption(rowCount++, yOffset, &Config::EnemyCounter, true);
+            DrawConfigOption(rowCount++, yOffset, &Config::ShowSonicPosition, true);
             DrawConfigOption(rowCount++, yOffset, &Config::FPSCounterStyleInStages, Config::ShowFPS, &Localise("Options_Desc_FPSCounterOff"));
             break;
         }
