@@ -231,6 +231,30 @@ std::unordered_map<std::string_view, std::unordered_map<ELanguage, std::string>>
         }
     },
     {
+        // Notes: used for the button guide on the world map, to cycle between countries (LB/RB).
+        "WorldMap_Country",
+        {
+            { ELanguage::English,  "Country" },
+            { ELanguage::Japanese, "エリア" },
+            { ELanguage::German,   "Land" },
+            { ELanguage::French,   "Pays" },
+            { ELanguage::Spanish,  "País" },
+            { ELanguage::Italian,  "Paese" }
+        }
+    },
+    {
+        // Notes: used for the button guide on the world map, to switch between day and night stages.
+        "WorldMap_DayNight",
+        {
+            { ELanguage::English,  "Day/Night" },
+            { ELanguage::Japanese, "昼/夜" },
+            { ELanguage::German,   "Tag/Nacht" },
+            { ELanguage::French,   "Jour/Nuit" },
+            { ELanguage::Spanish,  "Día/Noche" },
+            { ELanguage::Italian,  "Giorno/Notte" }
+        }
+    },
+    {
         // Notes: used for the button guide at the pause menu.
         "Achievements_Name",
         {

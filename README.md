@@ -26,35 +26,32 @@ Please [click here](https://github.com/bluechilliz3/Enhanced-UnRecomp/tree/all-e
 
 ## Highlighted Feature
 
-### No BGM Restart on Respawn
+### World Map Navigation Buttons
 
-In the modern games the music longer restarts, so it's in the roadmap! If you played the modern games you'll less like to restart the stage as the grove hasn't moved.
+Quickly navigate the globe by pressing the bumper buttons (cycle the countries) and Y/Triangle (toggle between Day/Night). Cycling through the countries is based on the story progression order. Locked countries (no flag on the globe) are skipped and in the stage list, countries with nothing cleared are skipped too.
 
-> [!NOTE]
-> 
-> Using the restart button in the pause menu will restart the BGM as before. So as clicking retry in the after failing a Hot Dog Mission.
+## Controls
+
+| Where              | Button  | Effect                                                                                              | Prompt              |
+| ------------------ | ------- | --------------------------------------------------------------------------------------------------- | ------------------- |
+| Browsing the globe | LB / RB | Camera eases to the previous or next unlocked country.                                              | `[LB] Country [RB]` |
+| Browsing the globe | Y       | Switches the hovered country's info panel between day and night stages, and spins the sun to match. | none (no room)      |
+| Stage list         | Y       | Rebuilds the list for the other time of day and spins the sun to match.                             | `[Y] Day/Night`     |
+| Stage list         | LB / RB | Rebuilds the list for the previous or next country with cleared stages, and turns the globe to it.  | none (no room)      |
+
+*If controler icons are set to PlayStation it'll show L1/R1/Triangle.*
 
 # Known Issues
 
-## Eggmanland
+## Some prompts aren't shown in stage list
 
-If you die as the other form of Sonic before hitting the checkpoint, respawning to the previous form won't update the BGM. 
-
-For example when finishing the first Werehog section and _hitting the hourglass_ to switch back to Day Sonic, if you miss the spring and fall, you'll respawn back to the start of the Werehog section as the Werehog but it'll still play the Day version of Eggmanland.
-
-> [!NOTE]
-> 
-> This is even with `FixEggmanlandUsingEventGalleryTransition` being turn on or off.
+This is because there wasn't enough room to show all the orompts but the buttons still work as shoen above.
 
 # FAQ
 
-## How to turn on the feature?
+## Why does go the stage go into day mode when passing Eggmanland?
 
-You need to edit `ModsDB.ini` under the mod folder and add `CodeX="DisableMusicRestartOnDeath"` (where X is the highest number) and update the `CodeCount`. Now you can download `ExtraCodes.hmm` (from the [releases](https://github.com/bluechilliz3/Enhanced-UnRecomp/releases) tab) to your mod folder and it'll show the option in the HedgeModManager.
-
-> [!NOTE]
-> 
-> Using the `ExtraCodes.hmm` will show other options that aren't compatible with this feature branch. The game will ignore it.
+While there's the werehog boss stage, Eggmanland as a country never has a night mode. The original always show the <mark>Crimson Carnival</mark> text brighter green gradient no matter if the sun was shining on the country or not.
 
 # Building
 
