@@ -51,7 +51,7 @@ If that doesn't work you can change `ModsDB.ini` in the `mods` folder (on the [U
 
 Keep on boosting while on the bobsleigh in stages like Cool Edge Act 1 or the second day section of Eggmanland! Never stay out of that momentum like in Unwiished.
 
-You update ModsDB.ini` in the `mods` folder and CodeX="AllowBobsleighBoost"` under the `[Codes]`
+You update ModsDB.ini `in the` mods `folder and CodeX="AllowBobsleighBoost"` under the `[Codes]`
 
 > [!NOTE]
 > 
@@ -79,6 +79,18 @@ It was used initially for testing the ribbons itself but it looked nice so it st
 
 Useful for debugging a stage mod, show Sonic's **x, y, z** coordinate in the ribbon.
 
+### Titan Music respects Battle Music Preference
+
+The behavior matches Eggmanland's way of handling battle music (by not playing any type of battle music). This feature is opt-out, so if you want the titan music but the main battle music off, you turn on `TitanThemeExemption` in the HedgeModManager.
+
+> [!NOTE]
+> 
+> Leaving battle music on will also let the titan music (a.k.a. mini bosses) play as normal regardless what `TitanThemeExemption` was set.
+
+### World Map Quick Navigation
+
+Use the bumpers and Y/Triangle to zip through the map and stage list. Say goodbye to losing years out of your life because you missed the sunset or sunrise.
+
 ## Minimum System Requirements
 
 - CPU with support for the AVX instruction set:
@@ -103,23 +115,19 @@ Useful for debugging a stage mod, show Sonic's **x, y, z** coordinate in the rib
 
 # How do I run Enhanced-UnRecomp?
 
-1. You run hedge-dev's Unleashed Recompiled to install the assets of the game if you haven't played the game on PC before. You can find [their guide on their repo](https://github.com/hedge-dev/UnleashedRecomp#how-to-install).
+You head over to the [releases tab](https://github.com/bluechilliz3/Enhanced-UnRecomp/releases) to enjoy the latest version. If you're on Linux or Windows you place the executable next to hedge-dev's version Unleashed Recompiled and it should pick up the same assets. On macOS, follow the gatekeeper instructions above the download.
 
-2. You need to build this project. Go to the [building instruction](/docs/BUILDING.md). 
-
-3. Run the game, enjoy!
-
-> [!NOTE]
+> [!CAUTION]
 > 
-> At the time being, there's no direct link for an `.exe`, `.dmg`, `.appimage` or `.app` file.
+> hedge-dev left a security warning to do not download builds of Unleashed Recompiled from anywhere but their [Releases tab](https://github.com/hedge-dev/UnleashedRecomp/releases/latest).
 > 
-> If you're stuck after reading the building instruction, ask a software developer friend (or Linux veteran) if they can help with the instructions.
+> This is a valid safety PSA and I support it. You're welcome to be vigilant and compare all the code changes I made compared to hedge-dev's build [here](https://github.com/hedge-dev/UnleashedRecomp/compare/main...bluechilliz3:Enhanced-UnRecomp:all-enhancements) then click on **file changes**.
+> 
+> **hedge-dev will never distribute builds on other websites, via Discord servers or via third-party update tools. And I *will* follow that that protocol too.**
+> 
+> Do not download Enhanced-UnRecomp anywhere else but the [releases tab](https://github.com/bluechilliz3/Enhanced-UnRecomp/releases) from this page.
 
 # Update Roadmap
-
-## Enemy Kill Count on All Action Stages
-
-Using the hot dog missions objectives see how enemies you killed in the stage. If you have `SaveScoreAtCheckpoints` turned on it will have the counter reflect that option.
 
 ## More Colors on Controller LED
 
@@ -133,7 +141,7 @@ When Right Trigger Action is set to Boost, the placement displayed may look out 
 
 ## Sonic Hates the Bobsleigh when Boosting
 
-If you boost at least in the bobsleigh, there is a chance he'll hop off for touching the dash pannel or hitting a hazard. If this happens while occurring a hazard the damage will apply twice making him immediately (effectly killing him if he has low enough of a non-zero amount of rings). It is very funny.
+If you boost at least in the bobsleigh, there is a chance he'll hop off for touching the dash panel or hitting a hazard. If this happens while occurring a hazard the damage will apply twice making him immediately (effectivly killing him if he has low enough of a non-zero amount of rings). It is very funny.
 
 Also any damage dealt against the bobsleigh while glitched back to on-foot still apply to him even if the bobsleigh is far away (including it falling down/out of bounds).
 
