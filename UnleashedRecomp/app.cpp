@@ -5,6 +5,7 @@
 #include <kernel/function.h>
 #include <os/process.h>
 #include <patches/audio_patches.h>
+#include <patches/input_patches.h>
 #include <patches/inspire_patches.h>
 #include <patches/player_patches.h>
 #include <ui/game_window.h>
@@ -65,6 +66,9 @@ PPC_FUNC(sub_822C1130)
 
     // Player-state change notifications.
     PlayerPatches::Update();
+
+    // WorldMap-state for nav button prompts.
+    InputPatches::Update();
 
     // This function can also be called by the loading thread,
     // which SDL does not like. To prevent the OS from thinking
