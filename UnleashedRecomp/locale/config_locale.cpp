@@ -1,4 +1,6 @@
 #include <user/config.h>
+#include <format>
+#include <string>
 
 /*
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! LOCALISATION NOTES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -553,15 +555,31 @@ CONFIG_DEFINE_LOCALE(Subtitles)
     { ELanguage::Italian,  { "Sottotitoli", "Mostra i sottotitoli durante i dialoghi." } }
 };
 
+// A better of handling this option is changing the option to an enum use 
+// `CONFIG_DEFINE_ENUM_LOCALE`. But this break compatibility with other 
+// forks and the upstream options so we add another bool option.
+// `Config::TitanThemeExemption ? message when true : when false` 
 // Japanese Notes: This localization should include furigana.
 CONFIG_DEFINE_LOCALE(BattleTheme)
 {
-    { ELanguage::English,  { "Battle Theme", "Play the Werehog battle theme during combat.\n\nThis option will apply the next time you're in combat.\n\nExorcism missions and miniboss themes will be unaffected." } },
-    { ELanguage::Japanese, { "バトルテーマ", "バトル[中:ちゅう]に\u200Bウェアホッグの\u200Bバトルテーマを\u200B[再生:さいせい]するか\u200B[選択:せんたく]できます\n\nこのオプションは\u200B[次回:じかい]のバトルから\u200B[適用:てきよう]されます\n\n[\u2005除\u2005霊\u2005:エクソシズム]ミッションと\u200Bミニボステーマには\u200B[\u2005影響\u2005:えいきょう]しません" } },
-    { ELanguage::German,   { "Kampfmusik", "Spiele die Kampfmusik des Werehogs während dem Kämpfen ab.\n\nDiese Option tritt das nächste Mal, wenn du in einen Kampf gerätst, in Kraft.\n\nExorzismen und Mini-Bosse werden hiervon nicht beeinflusst." } },
-    { ELanguage::French,   { "Thème de combat", "Joue le thème de combat du Werehog pendant ces derniers.\n\nCette option s'appliquera la prochaine fois que vous serez en combat.\n\nLes missions d'exorcisme et les thèmes des miniboss ne seront pas affectés." } },
-    { ELanguage::Spanish,  { "Tema de batalla", "Reproduce el tema de batalla del Werehog durante el combate.\n\nEsta opción se aplicará la próxima vez que entres en combate.\n\nLas misiones de exorcismo y los temas de los minijefes no se verán afectados." } },
-    { ELanguage::Italian,  { "Musica di combattimento", "Riproduci la musica di combattimento del Werehog quando inizi una battaglia.\n\nQuesta opzione verrà applicata la prossima volta che sei in battaglia.\n\nLa traccia musicale verrà riprodotta ugualmente nelle missioni di Esorcismo e i miniboss." } }
+    { ELanguage::English,  { "Battle Theme", Config::TitanThemeExemption ?
+        "Play the Werehog battle theme during combat.\n\nThis option will apply the next time you're in combat.\n\nExorcism missions and miniboss themes will be unaffected." :
+        "Play the Werehog battle theme during combat.\n\nThis option will apply the next time you're in combat.\n\nExorcism missions will be unaffected."} },
+    { ELanguage::Japanese, { "バトルテーマ", Config::TitanThemeExemption ?
+        "バトル[中:ちゅう]に\u200Bウェアホッグの\u200Bバトルテーマを\u200B[再生:さいせい]するか\u200B[選択:せんたく]できます\n\nこのオプションは\u200B[次回:じかい]のバトルから\u200B[適用:てきよう]されます\n\n[\u2005除\u2005霊\u2005:エクソシズム]ミッションと\u200Bミニボステーマには\u200B[\u2005影\u2005響\u2005:えいきょう]しません" :
+        "バトル[中:ちゅう]に\u200Bウェアホッグの\u200Bバトルテーマを\u200B[再生:さいせい]するか\u200B[選択:せんたく]できます\n\nこのオプションは\u200B[次回:じかい]のバトルから\u200B[適用:てきよう]されます\n\n[\u2005除\u2005霊\u2005:エクソシズム]ミッションには\u200B[\u2005影\u2005響\u2005:えいきょう]しません" } },
+    { ELanguage::German,   { "Kampfmusik", Config::TitanThemeExemption ?
+        "Spiele die Kampfmusik des Werehogs während des Kampfes ab.\n\nDiese Option tritt das nächste Mal, wenn du in einen Kampf gerätst, in Kraft.\n\nExorzismusmissionen und Miniboss-Themes werden hiervon nicht beeinflusst." :
+        "Spiele die Kampfmusik des Werehogs während des Kampfes ab.\n\nDiese Option tritt das nächste Mal, wenn du in einen Kampf gerätst, in Kraft.\n\nExorzismusmissionen werden hiervon nicht beeinflusst."} },
+    { ELanguage::French,   { "Thème de combat", Config::TitanThemeExemption ?
+        "Joue le thème de combat du Werehog pendant les combats.\n\nCette option s'appliquera la prochaine fois que vous serez en combat.\n\nLes missions d'exorcisme et les thèmes des miniboss ne seront pas affectés." :
+        "Joue le thème de combat du Werehog pendant les combats.\n\nCette option s'appliquera la prochaine fois que vous serez en combat.\n\nLes missions d'exorcisme ne seront pas affectées."} },
+    { ELanguage::Spanish,  { "Tema de batalla", Config::TitanThemeExemption ?
+        "Reproduce el tema de batalla del Werehog durante el combate.\n\nEsta opción se aplicará la próxima vez que entres en combate.\n\nLas misiones de exorcismo y los temas de los minijefes no se verán afectados." :
+        "Reproduce el tema de batalla del Werehog durante el combate.\n\nEsta opción se aplicará la próxima vez que entres en combate.\n\nLas misiones de exorcismo no se verán afectadas."} },
+    { ELanguage::Italian,  { "Musica di combattimento", Config::TitanThemeExemption ?
+        "Riproduci la musica di combattimento del Werehog durante i combattimenti.\n\nQuesta opzione verrà applicata la prossima volta che sei in battaglia.\n\nLe missioni di Esorcismo e i temi dei miniboss non saranno influenzati." :
+        "Riproduci la musica di combattimento del Werehog durante i combattimenti.\n\nQuesta opzione verrà applicata la prossima volta che sei in battaglia.\n\nLe missioni di Esorcismo non saranno influenzate."} }
 };
 
 // Japanese Notes: This localization should include furigana.

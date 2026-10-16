@@ -149,8 +149,11 @@ void WerehogBattleMusicMidAsmHook(PPCRegister& r11)
     if (Config::BattleTheme)
         return;
 
-    // Swap CStateBattle for CStateNormal.
-    if (r11.u8 == 4)
+    bool turnOffTitanMusic = !Config::TitanThemeExemption && r11.u8 == 5;
+
+    // Original action of swapping CStateBattle for CStateNormal which now
+    // also swaps the the state for the Titan state.
+    if (r11.u8 == 4 || turnOffTitanMusic)
         r11.u8 = 3;
 }
 
