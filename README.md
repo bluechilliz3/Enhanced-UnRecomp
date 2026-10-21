@@ -139,12 +139,6 @@ If you have a DualShock 4 or DualSense controller, more colors are coming. Green
 
 When Right Trigger Action is set to Boost, the placement displayed may look out of place.
 
-## Sonic Hates the Bobsleigh when Boosting
-
-If you boost at least in the bobsleigh, there is a chance he'll hop off for touching the dash panel or hitting a hazard. If this happens while occurring a hazard the damage will apply twice making him immediately (effectivly killing him if he has low enough of a non-zero amount of rings). It is very funny.
-
-Also any damage dealt against the bobsleigh while glitched back to on-foot still apply to him even if the bobsleigh is far away (including it falling down/out of bounds).
-
 # FAQ
 
 ## Why does the installer say my files are invalid?

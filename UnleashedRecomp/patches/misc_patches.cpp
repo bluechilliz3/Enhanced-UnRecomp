@@ -284,13 +284,16 @@ PPC_FUNC(sub_82B4DB48)
 // (sub_82354258) and MsgFinishBoostInExternalControl (sub_823542A8),
 // which begin/end the regular boost on the player speed context. 
 //
-// NOTE: engaging the real boost is deliberately "buggy but fun". Boosting
-// Sonic in the sled drains the boost gauge and, because his collision response
-// changes, a dash-ramp or a hit while boosting can eject him from the sled.
-// Isolating just the aura/voice avoided the ejection but the boost voice/whoosh
-// cues are not resident in the bobsleigh's sound bank, so the full boost is
-// used for the better feel.
+// NOTE: the real boost is used (not just its aura/voice) because the boost
+// voice/whoosh cues are not resident in the bobsleigh's sound bank. A genuinely
+// boosting Sonic drains the boost gauge as usual. The boost also switches
+// Sonic's collision, which used to throw him off the sled; the collision guard
+// on sub_82370528 below stops that.
 static bool g_isBobsleighBoosting;
+
+// Message actor ID of the sled whose ride the boost was used on, or 0. Arms the
+// collision guard on sub_82370528 for the rest of that ride.
+static uint32_t g_bobsleighBoostRideId;
 
 // Mirrors MsgStartBoostInExternalControl (sub_82354258 = sub_82377628 +
 // sub_82377998) and MsgFinishBoostInExternalControl (sub_823542A8 =
@@ -312,6 +315,10 @@ static void SetBobsleighBoost(bool active)
 
     if (active)
     {
+        // Arm the collision guard before the boost plugin starts, as starting
+        // it is what switches the collision.
+        g_bobsleighBoostRideId = pContext->m_ExternalControlActorID;
+
         GuestToHostFunction<void>(sub_82377628, pContext);
         GuestToHostFunction<void>(sub_82377998, pContext, 1);
     }
@@ -354,12 +361,45 @@ PPC_FUNC(sub_8266F538)
     __imp__sub_8266F538(ctx, base);
 }
 
+// Sonic context's collision mode setter. It stores the mode, resizes the 
+// rigid body and sets Sonic's event collision type. The boost plugin calls 
+// it with 2 (boost collision) when it starts (sub_8239E650) and with 0 
+// (normal) when it ends.
+//
+// When Sonic boards, the sled sets his event
+// collision to type 6 through MsgChangeEventCollisionTypeInExternalControl.
+// Type 6 turns off all of Sonic's own collision, so only the sled touches
+// hazards, dash panels and jump panels.
+//
+// So for the rest of a ride the boost was used on, ignore mode changes. The
+// sled's own collision changes go straight to CSonic, so they still apply. The
+// guard compares the player's current external controller with the sled the
+// boost was armed on. That ID is cleared when the ride ends (sub_8231E498), so
+// the guard can't outlive the ride.
+PPC_FUNC_IMPL(__imp__sub_82370528);
+PPC_FUNC(sub_82370528)
+{
+    if (g_bobsleighBoostRideId != 0)
+    {
+        auto pContext = (SWA::Player::CSonicContext*)(base + ctx.r3.u32);
+
+        if (pContext->m_ExternalControlActorID == g_bobsleighBoostRideId)
+            return;
+    }
+
+    __imp__sub_82370528(ctx, base);
+}
+
 // Player's MsgFinishExternalControl handler. External control ends when the
 // ride ends, so ending the boost here guarantees the boost state can't leak 
 // onto on-foot Sonic.
 PPC_FUNC_IMPL(__imp__sub_82354048);
 PPC_FUNC(sub_82354048)
 {
+    // Ride over: disarm the collision guard so the boost plugin's own end
+    // (which runs on its next update) puts Sonic's normal collision back.
+    g_bobsleighBoostRideId = 0;
+
     SetBobsleighBoost(false);
 
     BobsleighBoostOverlay::EndRide();
