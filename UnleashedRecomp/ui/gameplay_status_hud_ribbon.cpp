@@ -675,6 +675,12 @@ static void UpdateNativeRibbons(uint32_t hud, HudKind kind)
         auto& request = g_nativeRequests[i];
         const bool wanted = hudVisible && (now - request.stamp.load(std::memory_order_relaxed)) < 0.15;
 
+        // The game freed this clone's scene, and its nodes with it (the CScene destructor hook
+        // cleared the slot): forget it rather than call into them. A new one is made below if
+        // the row still wants it.
+        if (clone.scene != 0 && g_nativeSceneAddr[i].load(std::memory_order_relaxed) != clone.scene)
+            clone = {};
+
         // A new clone starts at its scene origin (the screen's top-left) until the placement
         // below has been applied by a scene update, so keep it hidden for its first frame.
         bool justCreated = false;
@@ -1258,6 +1264,26 @@ PPC_FUNC(sub_824D7EE8)
 {
     DestroyNativeRibbons(ctx.r3.u32);
     __imp__sub_824D7EE8(ctx, base);
+}
+
+// Chao::CSD::CScene's destructor body. The hooks above drop the clones whenever we know their HUD 
+// or project is going, but a project can also free its scenes some other way. In the 
+// Perfect Dark Gaia fight, after the shield sequence, a clone's scene died while its HUD and project 
+// pointer stayed the same, and the next CNode::SetText on its digits (sub_830BF640) read the freed 
+// scene's null data pointer: a bus error. Whatever frees a clone's scene, clear its slot here 
+// UpdateNativeRibbons then forgets the clone, and the render hook stops matching it.
+PPC_FUNC_IMPL(__imp__sub_830BCD10);
+PPC_FUNC(sub_830BCD10)
+{
+    const uint32_t scene = ctx.r3.u32;
+
+    for (auto& sceneAddr : g_nativeSceneAddr)
+    {
+        uint32_t expected = scene;
+        sceneAddr.compare_exchange_strong(expected, 0, std::memory_order_relaxed);
+    }
+
+    __imp__sub_830BCD10(ctx, base);
 }
 
 void GameplayStatusHud::Init()
