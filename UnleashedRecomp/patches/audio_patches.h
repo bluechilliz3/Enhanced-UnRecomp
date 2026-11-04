@@ -8,4 +8,11 @@ protected:
 public:
     static bool CanAttenuate();
     static void Update(float deltaTime);
+
+    // DisableMusicRestartOnDeath: true while a "keep the music" button is held during a
+    // pause menu Restart.
+    static bool IsKeepMusicButtonHeld();
+
+    static void OnMenuConfirm();
+    static bool IsRestartKeepingMusic();
 };

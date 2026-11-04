@@ -4,6 +4,7 @@
 #include <ui/button_guide.h>
 #include <ui/options_menu.h>
 #include <locale/locale.h>
+#include <patches/audio_patches.h>
 #include <app.h>
 
 bool g_isClosed;
@@ -180,6 +181,11 @@ PPC_FUNC(sub_824B0930)
             ButtonGuide::Close();
             g_isClosed = true;
         }
+
+        // DisableMusicRestartOnDeath: remember whether a "keep the music" button was held
+        // when A confirmed this pause choice (read if the choice turns out to be Restart).
+        if (pInputState && pInputState->GetPadState().IsTapped(SWA::eKeyState_A))
+            AudioPatches::OnMenuConfirm();
 
         __imp__sub_824B0930(ctx, base);
     }
