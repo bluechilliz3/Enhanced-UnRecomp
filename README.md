@@ -59,7 +59,9 @@ You update ModsDB.ini `in the` mods `folder and CodeX="AllowBobsleighBoost"` und
 > 
 > The watermark will show the coefficient compared to bobsleighing without boosting.
 
-***The option is extremely buggy.***
+Here's a video example with boosting inside the bobsleigh enabled. It also showcases **extra ribbons in HUD**.
+
+[![Bobsleigh Boosting video example](https://img.youtube.com/vi/uLfZguI1rOU/0.jpg)](https://www.youtube.com/watch?v=uLfZguI1rOU)
 
 ### Extra Ribbons in HUD
 
