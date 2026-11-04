@@ -32,31 +32,17 @@ I like the boost effect and it's annoying you can't do it in the bobsleigh so I'
 
 # Known Issues
 
-To name a few (yikes)
-
-## Sonic Escapes the Bobsleigh
-
-If you boost at least once, he has the tendency to escape the bobsleigh. This can be from:
-
-- Hitting a hazard
-
-- Jump or Dash panel
-
-- Turning very sharply
-
-## Duplicated Damages
-
-Sonic will have damage against him at least twice (one on the bobsleigh and again after escaping). If Sonic's ring count is low enough rings (where it will got from some amount to zero on the first hit) he will die.
-
-## Sonic Still Gets Damages from the Bobsleigh after Escaping
-
-This derives from both issues above. If the bobsleigh didn't despawn due to sonic prematurely escaping it, Sonic will still get damages from the hazards the bobsleigh has encountered. If the bobsleigh falls it will trigger a respawn on sonic like if he was still on it.
+The issues from the previous build has been **fixed**.
 
 # FAQ
 
 ## How to turn on the feature?
 
 You need to edit `ModsDB.ini` under the mod folder and add `CodeX="AllowBobsleighBoost"` (where X is the highest number) and update the `CodeCount`. How you can download `ExtraCodes.hmm` (from the [releases](https://github.com/bluechilliz3/Enhanced-UnRecomp/releases) tab) to your mod folder and it'll show the option in the HedgeModManager.
+
+## Why do I see a watermark when boosting inside the bobsleigh?
+
+This is to protect public leaderboards so the auditors can categorise the runs with this feature enabled.
 
 > [!NOTE]
 > 
