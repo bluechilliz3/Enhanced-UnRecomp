@@ -11,6 +11,7 @@ public:
     static inline bool s_isSaving;
     static inline bool s_isWerehog;
     static inline bool s_isSaveDataCorrupt;
+    static inline bool s_isLoadingScreenHidden;
 
     static inline ELanguage s_language;
 

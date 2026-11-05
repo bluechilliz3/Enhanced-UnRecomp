@@ -1,6 +1,7 @@
 #include <api/SWA.h>
 #include <hid/hid.h>
 #include <os/logger.h>
+#include <patches/audio_patches.h>
 #include <user/achievement_manager.h>
 #include <user/persistent_storage_manager.h>
 #include <user/config.h>
@@ -42,7 +43,16 @@ PPC_FUNC(sub_824DCF38)
         }
     }
 
+    /* DisableMusicRestartOnDeath: a respawn, or a restart with a "keep the music"
+       button held, skips the loading screen while the music keeps playing (like
+       modern games restarting a level). Restarts that restart the music (no button
+       held, or Eggmanland switching form) keep their loading screen. */
+    if (AudioPatches::IsRestartKeepingMusic())
+        ctx.r4.u32 = SWA::eLoadingDisplayType_None;
+
     __imp__sub_824DCF38(ctx, base);
+
+    App::s_isLoadingScreenHidden = !pLoading->m_IsScreenVisible;
 }
 
 // The game checks for a bool to render the PS3 transition animation. It's never set so it's presumably a "is PS3" bool.
@@ -74,7 +84,10 @@ PPC_FUNC(sub_824DAB60)
     __imp__sub_824DAB60(ctx, base);
 
     if (!pLoading->m_LoadingDisplayType)
+    {
         App::s_isLoading = false;
+        App::s_isLoadingScreenHidden = false;
+    }
 }
 
 // Load voice language files.
