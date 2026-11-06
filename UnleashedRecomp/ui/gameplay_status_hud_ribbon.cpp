@@ -143,7 +143,7 @@ static bool IsGameplayActive()
 // - in the (recomps) options menu
 static bool IsNativeGameHudVisible()
 {
-    if (App::s_isLoading)
+    if (App::s_isLoading && !App::s_isLoadingScreenHidden)
         return false;
 
     const bool* loading = SWA::SGlobals::ms_IsLoading;
