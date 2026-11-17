@@ -2,6 +2,12 @@ Enhanced-UnRecomp is a derivation of Unleashed Recompiled. It contains enhanceme
 
 **This project does not include any game assets. You must provide the files from your own legally acquired copy of the game to install or build Enhanced-UnRecomp.**
 
+> [!NOTE]
+> 
+> Most of the enhancements has AI involved in this fork. And this is **not** to be confused by hedge-dev's original project where they have a strong anti-AI policy.
+> 
+> While AI was used, everything that was pushed has been checked to make there's no bugs or performance haemorrhages (unless stated under the known issues section) to make sure this fork isn't another typical AI slop.
+
 ## Table of Contents
 
 - [Features](#features)
@@ -27,6 +33,9 @@ Enhanced-UnRecomp is a derivation of Unleashed Recompiled. It contains enhanceme
 Like in the modern games you can natively use Right Trigger to boost! Enable it in the options under the <mark>Input</mark> tab and enjoy. No more needing to flip between controller remapping software when you swap between Day & Night Sonic (especially in Eggmanland).
 
 https://github.com/user-attachments/assets/6b23e4e8-d364-4c31-bce6-3406b643c1da
+
+> [!NOTE]
+> The thumbnail was created by myself using Pixelmator Pro using the PSD template provided by hedge-dev. The Sonic drifting in the thumbnail was from my in-game screenshot which was carefully cut and color-corrected by hand. [My PSD file](https://github.com/hedge-dev/UnleashedRecompResources/blob/35c919352bdc7a982db3f384c7e9633a98ae4d95/images/options_menu/thumbnails/psd/Right%20Trigger%20Action.psd) is next to the other PSD files that hedge-dev created.
 
 Here's a video example using right trigger to boost.
 
